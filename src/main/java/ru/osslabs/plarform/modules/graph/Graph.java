@@ -102,16 +102,6 @@ public interface Graph<V, E extends Edge<V>> {
     Graph<V, E> addEdge(E edge);
 
     /**
-     * Return instance object of edge which is in instance graph. This method
-     * can use in scenarios where E1 == E2, but E contain fields don't uses in
-     * hashcode and equals
-     *
-     * @param edge instance edge for search
-     * @return instance edge contains in graph
-     */
-    E getEdge(E edge);
-
-    /**
      * Returns the edge factory using which this graph creates new edges. The
      * edge factory is defined when the graph is constructed and must not be
      * modified.
@@ -170,16 +160,6 @@ public interface Graph<V, E extends Edge<V>> {
      *                              null</code>.
      */
     Graph<V, E> addVertex(V v);
-
-    /**
-     * Return instance object of vertex which is in instance graph. This method
-     * can use in scenarios where V1 == V2, but V contain fields don't uses in
-     * hashcode and equals
-     *
-     * @param vertex instance vertex for search
-     * @return instance edge contains in graph
-     */
-    V getVertex(V vertex);
 
     /**
      * Adds all the vertices and all the edges of the {@code sourceGraph} to the

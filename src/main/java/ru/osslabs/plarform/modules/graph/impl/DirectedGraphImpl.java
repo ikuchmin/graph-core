@@ -24,11 +24,6 @@ public class DirectedGraphImpl<V, E extends Edge<V>> extends AbstractBaseGraph<V
     }
 
     @Override
-    public E getEdge(E edge) {
-        throw new UnsupportedOperationException("Operation not supported");
-    }
-
-    @Override
     public Graph<V, E> addEdge(E edge) {
         Objects.requireNonNull(edge);
         DirectedEdgeContainer<V, E> src = vertices.get(edge.getSource());
@@ -65,11 +60,6 @@ public class DirectedGraphImpl<V, E extends Edge<V>> extends AbstractBaseGraph<V
     public Graph<V, E> addVertex(V vertex) {
         vertices.put(vertex, new DirectedEdgeContainer<>(vertex));
         return this;
-    }
-
-    @Override
-    public V getVertex(V vertex) {
-        return vertices.get(vertex).getVertex();
     }
 
     /**
