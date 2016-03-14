@@ -39,11 +39,10 @@
  */
 package ru.osslabs.plarform.modules.graph.impl;
 
-import org.jgrapht.*;
+import ru.osslabs.plarform.modules.graph.Edge;
+import ru.osslabs.plarform.modules.graph.Graph;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Set;
 
 
 /**
@@ -52,110 +51,46 @@ import java.util.Set;
  * graphs. Query operations on this graph "read through" to the backing graph,
  * and attempts to modify this graph result in an <code>
  * UnsupportedOperationException</code>.
- *
+ * <p>
  * <p>This graph does <i>not</i> pass the hashCode and equals operations through
  * to the backing graph, but relies on <tt>Object</tt>'s <tt>equals</tt> and
  * <tt>hashCode</tt> methods. This graph will be serializable if the backing
  * graph is serializable.</p>
- *
- * @author Barak Naveh
- * @since Jul 24, 2003
  */
-public class UnmodifiableGraph<V, E>
-    extends GraphDelegator<V, E>
-    implements Serializable
-{
-
+public class UnmodifiableGraph<V, E extends Edge<V>>
+        extends GraphDelegator<V, E>
+        implements Serializable {
 
     private static final long serialVersionUID = 3544957670722713913L;
     private static final String UNMODIFIABLE = "this graph is unmodifiable";
-
-
 
     /**
      * Creates a new unmodifiable graph based on the specified backing graph.
      *
      * @param g the backing graph on which an unmodifiable graph is to be
-     * created.
+     *          created.
      */
-    public UnmodifiableGraph(Graph<V, E> g)
-    {
+    public UnmodifiableGraph(Graph<V, E> g) {
         super(g);
     }
 
-
-
-    /**
-     * @see Graph#addEdge(Object, Object)
-     */
-    @Override public E addEdge(V sourceVertex, V targetVertex)
-    {
+    @Override
+    public Graph<V, E> addEdge(E edge) {
         throw new UnsupportedOperationException(UNMODIFIABLE);
     }
 
-    /**
-     * @see Graph#addEdge(Object, Object, Object)
-     */
-    @Override public boolean addEdge(V sourceVertex, V targetVertex, E e)
-    {
+    @Override
+    public Graph<V, E> addEdge(V sourceVertex, V targetVertex) {
         throw new UnsupportedOperationException(UNMODIFIABLE);
     }
 
-    /**
-     * @see Graph#addVertex(Object)
-     */
-    @Override public boolean addVertex(V v)
-    {
+    @Override
+    public Graph<V, E> addVertex(V v) {
         throw new UnsupportedOperationException(UNMODIFIABLE);
     }
 
-    /**
-     * @see Graph#removeAllEdges(Collection)
-     */
-    @Override public boolean removeAllEdges(Collection<? extends E> edges)
-    {
-        throw new UnsupportedOperationException(UNMODIFIABLE);
-    }
-
-    /**
-     * @see Graph#removeAllEdges(Object, Object)
-     */
-    @Override public Set<E> removeAllEdges(V sourceVertex, V targetVertex)
-    {
-        throw new UnsupportedOperationException(UNMODIFIABLE);
-    }
-
-    /**
-     * @see Graph#removeAllVertices(Collection)
-     */
-    @Override public boolean removeAllVertices(Collection<? extends V> vertices)
-    {
-        throw new UnsupportedOperationException(UNMODIFIABLE);
-    }
-
-    /**
-     * @see Graph#removeEdge(Object)
-     */
-    @Override public boolean removeEdge(E e)
-    {
-        throw new UnsupportedOperationException(UNMODIFIABLE);
-    }
-
-    /**
-     * @see Graph#removeEdge(Object, Object)
-     */
-    @Override public E removeEdge(V sourceVertex, V targetVertex)
-    {
-        throw new UnsupportedOperationException(UNMODIFIABLE);
-    }
-
-    /**
-     * @see Graph#removeVertex(Object)
-     */
-    @Override public boolean removeVertex(V v)
-    {
+    @Override
+    public Graph<V, E> addGraph(Graph<? extends V, ? extends E> sourceGraph) {
         throw new UnsupportedOperationException(UNMODIFIABLE);
     }
 }
-
-// End UnmodifiableGraph.java

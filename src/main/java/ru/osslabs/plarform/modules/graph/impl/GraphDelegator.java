@@ -59,14 +59,10 @@ import java.util.function.BiFunction;
  * <p>
  * <p>This class is mostly used as a base for extending subclasses.</p>
  *
- * @author Barak Naveh
- * @since Jul 20, 2003
  */
 public class GraphDelegator<V, E extends Edge<V>>
         extends AbstractGraph<V, E>
-        implements Graph<V, E>,
-        Serializable {
-
+        implements Graph<V, E>, Serializable {
 
     private static final long serialVersionUID = 3257005445226181425L;
 
@@ -90,31 +86,19 @@ public class GraphDelegator<V, E extends Edge<V>>
             throw new IllegalArgumentException("g must not be null.");
         }
 
-        delegate = g;
+        this.delegate = g;
     }
-
 
     @Override
     public Graph<V, E> addEdge(E edge) {
-        return delegate.addEdge();
+        return delegate.addEdge(edge);
     }
 
-    @Override
-    public E getEdge(E edge) {
-        return delegate.getEdge(edge);
-    }
-
-    /**
-     * @see Graph#getEdgeFactory()
-     */
     @Override
     public BiFunction<V, V, E> getEdgeFactory() {
         return delegate.getEdgeFactory();
     }
 
-    /**
-     * @see Graph#addEdge(Object, Object)
-     */
     @Override
     public Graph<V, E> addEdge(V sourceVertex, V targetVertex) {
         return delegate.addEdge(sourceVertex, targetVertex);
@@ -126,36 +110,29 @@ public class GraphDelegator<V, E extends Edge<V>>
     }
 
     @Override
-    public V getVertex(V vertex) {
-        return null;
-    }
-
-    @Override
     public Graph<V, E> addGraph(Graph<? extends V, ? extends E> sourceGraph) {
-        return null;
+        return delegate.addGraph(sourceGraph);
     }
 
     @Override
     public boolean containsEdge(E e) {
-        return false;
+        return delegate.containsEdge(e);
     }
 
     @Override
     public boolean containsVertex(V v) {
-        return false;
+        return delegate.containsVertex(v);
     }
 
     @Override
     public Set<E> edgesOf(V vertex) {
-        return null;
+        return delegate.edgesOf(vertex);
     }
 
     @Override
     public Set<V> vertexSet() {
-        return null;
+        return delegate.vertexSet();
     }
-
-
 }
 
 // End GraphDelegator.java
