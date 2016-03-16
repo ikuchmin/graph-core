@@ -3,6 +3,7 @@ package ru.osslabs.plarform.modules.graph.impl;
 import ru.osslabs.plarform.modules.graph.Edge;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,32 +16,29 @@ public abstract class AbstractBaseGraph<V, E extends Edge<V>> extends AbstractGr
     /**
      * A container for vertex edges.
      */
-    protected static class DirectedEdgeContainer<VV, EE extends Edge<VV>> {
+    public static class DirectedEdgeContainer<VV, EE extends Edge<VV>> {
         private final VV vertex;
-        private final Map<EE, Object> incoming = new ConcurrentHashMap<>();
-        private final Map<EE, Object> outgoing = new ConcurrentHashMap<>();
+        private final Set<EE> incoming = new HashSet<>();
+        private final Set<EE> outgoing = new HashSet<>();
 
-        // Dummy value to associate with an Object in the backing Map
-        private static final Object PRESENT = new Object();
-
-        DirectedEdgeContainer(VV vertex) {
+        public DirectedEdgeContainer(VV vertex) {
             this.vertex = vertex;
         }
 
         public Set<EE> getUnmodifiableIncomingEdges() {
-            return Collections.unmodifiableSet(incoming.keySet());
+            return Collections.unmodifiableSet(incoming);
         }
 
         public Set<EE> getUnmodifiableOutgoingEdges() {
-            return Collections.unmodifiableSet(outgoing.keySet());
+            return Collections.unmodifiableSet(outgoing);
         }
 
         public void addIncomingEdge(EE edge) {
-            incoming.put(edge, PRESENT);
+            incoming.add(edge);
         }
 
         public void addOutgoingEdge(EE edge) {
-            outgoing.put(edge, PRESENT);
+            outgoing.add(edge);
         }
 
         public VV getVertex() {

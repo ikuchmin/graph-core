@@ -4,10 +4,7 @@ import ru.osslabs.plarform.modules.graph.DirectedGraph;
 import ru.osslabs.plarform.modules.graph.Edge;
 import ru.osslabs.plarform.modules.graph.Graph;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
@@ -37,6 +34,12 @@ public class DirectedGraphImpl<V, E extends Edge<V>> extends AbstractBaseGraph<V
                     src != null ? src.getVertex() : null,
                     trg != null ? trg.getVertex() : null));
 
+        return this;
+    }
+
+    @Override
+    public Graph<V, E> addEdges(Collection<E> edges) {
+        edges.stream().forEach(this::addEdge);
         return this;
     }
 

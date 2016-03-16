@@ -157,19 +157,17 @@ class DirectedGraphImplTest extends Specification {
         thrown IllegalArgumentException
     }
 
-    @Canonical
-    class ExEdge<T> implements Edge<T> {
-        T source
-        T target
+    def "vertexSet was returned from graph should be unmodifiable"() {
+        given:
+        def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
+            new ExEdge<String>(source: source, target: target)
+        }).addVertex('v1').addVertex('v2').addEdge('v1', 'v2')
 
-        @Override
-        T getSource() {
-            return source
-        }
+        when:
+        graph.vertexSet().add('v3')
 
-        @Override
-        T getTarget() {
-            return target
-        }
+        then:
+        thrown UnsupportedOperationException
+
     }
 }

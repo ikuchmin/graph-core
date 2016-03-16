@@ -81,8 +81,8 @@ public interface Graph<V, E extends Edge<V>> {
 
 
     /**
-     * Creates a new edge in this graph, going from the source vertex to the
-     * target vertex, and returns the created edge. Some graphs do not allow
+     * Add edge in this graph, going from the source vertex to the
+     * target vertex, and returns graph instance. Some graphs do not allow
      * edge-multiplicity. In such cases, if the graph already contains an edge
      * from the specified source to the specified target, than this method does
      * not change the graph and returns <code>null</code>.
@@ -100,6 +100,27 @@ public interface Graph<V, E extends Edge<V>> {
      *                                  null</code>.
      */
     Graph<V, E> addEdge(E edge);
+
+    /**
+     * Add edges in this graph, going from the source vertex to the
+     * target vertex, and returns graph instance. Some graphs do not allow
+     * edge-multiplicity. In such cases, if the graph already contains an edge
+     * from the specified source to the specified target, than this method does
+     * not change the graph and returns <code>null</code>.
+     * <p/>
+     * <p>The source and target vertices must already be contained in this
+     * graph. If they are not found in graph IllegalArgumentException is
+     * thrown.</p>
+     * <p/>
+     *
+     * @param edges            collection edge to be added to this graph.
+     * @return <code>this</code>
+     * @throws IllegalArgumentException if source or target vertices are not
+     *                                  found in the graph.
+     * @throws NullPointerException     if any of the specified vertices is <code>
+     *                                  null</code>.
+     */
+    Graph<V, E> addEdges(Collection<E> edges);
 
     /**
      * Returns the edge factory using which this graph creates new edges. The

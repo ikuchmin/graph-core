@@ -12,6 +12,13 @@ repositories {
     mavenLocal()
 }
 
+sourceSets {
+    main {
+        java { srcDirs = [] }    // no source dirs for the java compiler
+        groovy { srcDirs = ["src/main/java", "src/main/groovy"] }  // compile   everything in src/ with groovy
+    }
+}
+
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.6:indy'
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
