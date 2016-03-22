@@ -223,7 +223,7 @@ public interface Graph<V, E extends Edge<V>> {
      * @throws IllegalArgumentException if vertex is not found in the graph.
      * @throws NullPointerException     if vertex is <code>null</code>.
      */
-    Set<E> edgesOf(V vertex);
+    Collection<E> edgesOf(V vertex);
 
     /**
      * Returns a set of the vertices contained in this graph. The set is backed
@@ -238,7 +238,5 @@ public interface Graph<V, E extends Edge<V>> {
      *
      * @return a set view of the vertices contained in this graph.
      */
-    Set<V> vertexSet();
-
-
+    Collection<V> vertexSet();
 }

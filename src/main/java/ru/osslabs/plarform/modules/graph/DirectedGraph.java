@@ -1,5 +1,6 @@
 package ru.osslabs.plarform.modules.graph;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -15,7 +16,7 @@ public interface DirectedGraph<V, E extends Edge<V>> extends Graph<V, E> {
      *
      * @return a set of all edges incoming into the specified vertex.
      */
-    Set<E> incomingEdgesOf(V vertex);
+    Collection<E> incomingEdgesOf(V vertex);
 
     /**
      * Returns a set of all edges outgoing from the specified vertex.
@@ -25,5 +26,9 @@ public interface DirectedGraph<V, E extends Edge<V>> extends Graph<V, E> {
      *
      * @return a set of all edges outgoing from the specified vertex.
      */
-    Set<E> outgoingEdgesOf(V vertex);
+    Collection<E> outgoingEdgesOf(V vertex);
+
+    boolean containsOutgoingVertices(V vertex, V... vertices);
+
+    boolean containsIncomingVertices(V vertex, V... vertices);
 }

@@ -106,22 +106,34 @@ public class DirectedGraphImpl<V, E extends Edge<V>> extends AbstractBaseGraph<V
     }
 
     @Override
-    public Set<E> edgesOf(V vertex) {
-        throw new UnsupportedOperationException("Operation not supported");
+    public Collection<E> edgesOf(V vertex) {
+        Objects.requireNonNull(vertex);
+
+        return vertices.get(vertex).getUnmodifiableOutgoingEdges();
     }
 
     @Override
-    public Set<V> vertexSet() {
+    public Collection<V> vertexSet() {
         return Collections.unmodifiableSet(vertices.keySet());
     }
 
     @Override
-    public Set<E> incomingEdgesOf(V vertex) {
+    public Collection<E> incomingEdgesOf(V vertex) {
         return vertices.get(vertex).getUnmodifiableIncomingEdges();
     }
 
     @Override
-    public Set<E> outgoingEdgesOf(V vertex) {
+    public Collection<E> outgoingEdgesOf(V vertex) {
         return vertices.get(vertex).getUnmodifiableOutgoingEdges();
+    }
+
+    @Override
+    public boolean containsOutgoingVertices(V vertex, V... vertices) {
+        return this.vertices.get(vertex).getUnmodifiableOutgoingVertices().containsAll(Arrays.asList(vertices));
+    }
+
+    @Override
+    public boolean containsIncomingVertices(V vertex, V... vertices) {
+        return this.vertices.get(vertex).getUnmodifiableIncomingVertices().containsAll(Arrays.asList(vertices));
     }
 }

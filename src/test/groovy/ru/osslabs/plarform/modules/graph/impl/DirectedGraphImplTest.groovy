@@ -1,11 +1,8 @@
 package ru.osslabs.plarform.modules.graph.impl
 
-import groovy.transform.Canonical
-import ru.osslabs.plarform.modules.graph.Edge
 import ru.osslabs.plarform.modules.graph.Graph
+import spock.lang.Ignore
 import spock.lang.Specification
-
-import java.lang.reflect.Proxy;
 
 /**
  * Created by ikuchmin on 09.03.16.
@@ -84,6 +81,7 @@ class DirectedGraphImplTest extends Specification {
 
     }
 
+    @Ignore("TODO")
     def "if edge was added to graph that would it contains in graph"() {
         given:
         def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
@@ -169,5 +167,17 @@ class DirectedGraphImplTest extends Specification {
         then:
         thrown UnsupportedOperationException
 
+    }
+
+    def "graph has capability for test outgoing vertices for some vertex"() {
+        given:
+        def graph = new DirectedGraphImpl<String, ExEdge<String>>(ExEdge.metaClass.&invokeConstructor)
+        graph.addVertex('v1').addVertex('v2').addVertex('v3')
+                .addEdge('v1', 'v2').addEdge('v1', 'v3')
+
+        expect:
+        graph.containsOutgoingVertices('v1', 'v2', 'v3')
+        graph.containsIncomingVertices('v2', 'v1')
+        graph.containsIncomingVertices('v3', 'v1')
     }
 }
