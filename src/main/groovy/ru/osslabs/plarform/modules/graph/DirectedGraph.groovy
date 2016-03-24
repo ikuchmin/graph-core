@@ -1,6 +1,7 @@
 package ru.osslabs.plarform.modules.graph;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -28,7 +29,11 @@ public interface DirectedGraph<V, E extends Edge<V>> extends Graph<V, E> {
      */
     Collection<E> outgoingEdgesOf(V vertex);
 
-    boolean containsOutgoingVertices(V vertex, V... vertices);
+    List<Boolean> containsOutgoingVertices(V vertex, V... vertices);
 
-    boolean containsIncomingVertices(V vertex, V... vertices);
+    List<Boolean> containsOutgoingVertices(V vertex, List<V> vertices);
+
+    List<Boolean> containsIncomingVertices(V vertex, V... vertices);
+
+    List<Boolean> containsIncomingVertices(V vertex, List<V> vertices);
 }

@@ -2,7 +2,6 @@ group 'ru.osslabs.platform.modules'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'groovy'
-apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.8
@@ -12,16 +11,30 @@ repositories {
     mavenLocal()
 }
 
+compileGroovy {
+    dependsOn = []
+}
+
+classes {
+    dependsOn = [compileGroovy]
+}
+
+compileTestGroovy {
+    dependsOn = [classes]
+}
+
+testClasses {
+    dependsOn = [compileTestGroovy]
+}
+
 sourceSets {
     main {
-        java { srcDirs = [] }    // no source dirs for the java compiler
         groovy { srcDirs = ["src/main/java", "src/main/groovy"] }  // compile   everything in src/ with groovy
     }
 }
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.6:indy'
-    compile 'one.util:streamex:0.5.5'
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }
 

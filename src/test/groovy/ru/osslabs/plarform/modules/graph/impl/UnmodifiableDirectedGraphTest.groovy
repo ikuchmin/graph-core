@@ -1,6 +1,5 @@
 package ru.osslabs.plarform.modules.graph.impl
 
-import ru.osslabs.plarform.modules.graph.Graph
 import spock.lang.Specification
 
 /**

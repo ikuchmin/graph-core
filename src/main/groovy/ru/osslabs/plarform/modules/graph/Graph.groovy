@@ -122,6 +122,8 @@ public interface Graph<V, E extends Edge<V>> {
      */
     Graph<V, E> addEdges(Collection<E> edges);
 
+//    Graph<V, E> addEdges(E... edges);
+
     /**
      * Returns the edge factory using which this graph creates new edges. The
      * edge factory is defined when the graph is constructed and must not be
@@ -129,7 +131,7 @@ public interface Graph<V, E extends Edge<V>> {
      *
      * @return the edge factory using which this graph creates new edges.
      */
-    BiFunction<V, V, E> getEdgeFactory();
+    BiFunction<V, V, E> edgeFactory();
 
     /**
      * Creates a new edge in this graph, going from the source vertex to the
@@ -162,7 +164,7 @@ public interface Graph<V, E extends Edge<V>> {
      * @throws NullPointerException if any of the specified vertices is <code>
      * null</code>.
      *
-     * @see #getEdgeFactory()
+     * @see #edgeFactory()
      */
     Graph<V, E> addEdge(V sourceVertex, V targetVertex);
 
@@ -181,6 +183,10 @@ public interface Graph<V, E extends Edge<V>> {
      *                              null</code>.
      */
     Graph<V, E> addVertex(V v);
+
+    Graph<V, E> addVertices(V... vertices);
+
+    Graph<V, E> addVertices(Collection<V> vertices);
 
     /**
      * Adds all the vertices and all the edges of the {@code sourceGraph} to the
@@ -212,6 +218,10 @@ public interface Graph<V, E extends Edge<V>> {
      * @return <tt>true</tt> if this graph contains the specified vertex.
      */
     boolean containsVertex(V v);
+
+    List<Boolean> containsVertices(V... v);
+
+    List<Boolean> containsVertices(List<V> v);
 
     /**
      * Returns a set of all edges touching the specified vertex. If no edges are

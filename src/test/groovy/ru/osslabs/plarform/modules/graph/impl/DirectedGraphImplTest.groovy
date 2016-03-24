@@ -9,133 +9,175 @@ import spock.lang.Specification
  */
 class DirectedGraphImplTest extends Specification {
 
-    def "graph should have capability add vertices"() {
-        given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
-            new Expando(source: source, target: target)
-        }).addVertex('v1')
+    def directedGraph = new DirectedGraphImpl<String, ExEdge<String>>(ExEdge.metaClass.&invokeConstructor)
 
+    def "graph can not be created without edge factory"() {
         when:
-        graph.addVertex('v2')
+        new DirectedGraphImpl<String, ExEdge<String>>()
 
         then:
-        graph.vertices.containsKey('v1')
-        graph.vertices.containsKey('v2')
+        thrown IllegalArgumentException
     }
 
-    def "graph should have capability add edges"() {
+    def "graph should have capability add vertices"() {
+        when:
+        directedGraph.addVertices('v1', 'v2')
+
+        then:
+        directedGraph.containsVertex('v1')
+        directedGraph.containsVertex('v2')
+    }
+
+    def "graph should have capability add edges on vertices"() {
         given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
-            new ExEdge<String>(source: source, target: target)
-        }).addVertex('v1').addVertex('v2')
+        directedGraph.addVertex('v1').addVertex('v2').addVertex('v3')
 
         when:
-        graph.addEdge('v1', 'v2')
-        println graph.vertices.v1
-                .unmodifiableOutgoingEdges
+        directedGraph.addEdge('v1', 'v2').addEdge('v1', 'v3')
 
         then:
-        graph.vertices.v1
-                .unmodifiableOutgoingEdges
-                .contains(new ExEdge<String>(source: 'v1', target: 'v2'))
+        directedGraph.containsOutgoingVertices('v1', 'v2', 'v3')
+        directedGraph.containsIncomingVertices('v2', 'v1')
+        directedGraph.containsIncomingVertices('v3', 'v1')
 
         when:
-        graph.addEdge(new ExEdge<String>(source: 'v1', target: 'v2'))
+        directedGraph.addEdge('v1', 'v4')
 
         then:
-        graph.vertices.v1
-                .unmodifiableOutgoingEdges
-                .contains(new ExEdge<String>(source: 'v1', target: 'v2'))
+        thrown IllegalArgumentException
+
+        when:
+        directedGraph.addEdge(null, 'v2')
+
+        then:
+        thrown IllegalArgumentException
+
+        when:
+        directedGraph.addEdge('v1', null)
+
+        then:
+        thrown IllegalArgumentException
+
+        when:
+        directedGraph.addEdge(null, null)
+
+        then:
+        thrown IllegalArgumentException
+    }
+
+    def "graph should have capability add edges with on edges"() {
+        given:
+        directedGraph.addVertex('v1').addVertex('v2').addVertex('v3')
+        def e1 = ['v1', 'v2'] as ExEdge
+        def e2 = ['v1', 'v3'] as ExEdge
+        def e3 = ['v1', 'v4'] as ExEdge
+        def e4 = ['v4', 'v1'] as ExEdge
+
+        when:
+        directedGraph.addEdge(e1).addEdge(e2)
+
+        then:
+        directedGraph.containsOutgoingVertices('v1', 'v2', 'v3')
+        directedGraph.containsIncomingVertices('v2', 'v1')
+        directedGraph.containsIncomingVertices('v3', 'v1')
+
+        when:
+        directedGraph.addEdge(e3)
+
+        then:
+        thrown IllegalArgumentException
+
+        when:
+        directedGraph.addEdge(e4)
+
+        then:
+        thrown IllegalArgumentException
+
+        when:
+        directedGraph.addEdge(null)
+
+        then:
+        thrown IllegalArgumentException
+
     }
 
     def "directed graph have directed edges"() {
         given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
-            new ExEdge<String>(source: source, target: target)
-        }).addVertex('v1').addVertex('v2')
-
+        directedGraph.addVertices('v1', 'v2')
         when:
-        graph.addEdge(new ExEdge<String>('v1', 'v2'))
+        directedGraph.addEdge(new ExEdge<String>('v1', 'v2'))
 
         then:
-        graph.vertices.v1
-                .unmodifiableOutgoingEdges
+        directedGraph.outgoingEdgesOf('v1')
                 .contains(new ExEdge<String>(source: 'v1', target: 'v2'))
 
-        !graph.vertices.v1
-                .unmodifiableIncomingEdges
+        !directedGraph.incomingEdgesOf('v1')
                 .contains(new ExEdge<String>(source: 'v1', target: 'v2'))
     }
 
     def "if vertex was added to graph that would it contains in graph"() {
         given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
+        def graph = new DirectedGraphImpl<String, ExEdge<String>>({ source, target ->
             new ExEdge<String>(source: source, target: target)
         })
 
         when:
-        graph.addVertex('v1')
+        directedGraph.addVertex('v1')
 
         then:
-        graph.containsVertex('v1')
+        directedGraph.containsVertex('v1')
 
     }
 
     @Ignore("TODO")
     def "if edge was added to graph that would it contains in graph"() {
         given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
+        def graph = new DirectedGraphImpl<String, ExEdge<String>>({ source, target ->
             new ExEdge<String>(source: source, target: target)
         }).addVertex('v1').addVertex('v2')
 
         when:
-        graph.addEdge(new ExEdge<String>('v1', 'v2'))
+        directedGraph.addEdge(new ExEdge<String>('v1', 'v2'))
 
         then:
-        graph.containsEdge(new ExEdge<String>('v1', 'v2'))
+        directedGraph.containsEdge(new ExEdge<String>('v1', 'v2'))
     }
 
     def "two some graph can be merged"() {
         given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
-            new ExEdge<String>(source: source, target: target)
-        }).addVertex('v1').addVertex('v2').addEdge('v1', 'v2')
-        def source = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
-            new ExEdge<String>(source: source, target: target)
-        }).addVertex('v3').addVertex('v4').addEdge('v3', 'v4')
+        directedGraph.addVertices('v1', 'v2', 'v3').addEdge('v1', 'v2')
+
+        def source = new DirectedGraphImpl<>(ExEdge.metaClass.&invokeConstructor)
+                .addVertices('v3', 'v4').addEdge('v3', 'v4')
 
         when:
-        graph.addGraph(source)
+        directedGraph.addGraph(source)
 
         then:
-        graph.vertices.containsKey('v1')
-        graph.vertices.containsKey('v2')
-        graph.vertices.containsKey('v3')
-        graph.vertices.v1
-                .unmodifiableOutgoingEdges
+        directedGraph.containsVertex('v1')
+        directedGraph.containsVertex('v2')
+        directedGraph.containsVertex('v3')
+        directedGraph.outgoingEdgesOf('v1')
                 .contains(new ExEdge<String>(source: 'v1', target: 'v2'))
-        graph.vertices.v2
-                .unmodifiableIncomingEdges
+        directedGraph.incomingEdgesOf('v2')
                 .contains(new ExEdge<String>(source: 'v1', target: 'v2'))
-        graph.vertices.v3
-                .unmodifiableOutgoingEdges
+        directedGraph.outgoingEdgesOf('v3')
                 .contains(new ExEdge<String>(source: 'v3', target: 'v4'))
-        graph.vertices.v4
-                .unmodifiableIncomingEdges
+        directedGraph.incomingEdgesOf('v4')
                 .contains(new ExEdge<String>(source: 'v3', target: 'v4'))
     }
 
     def "if two graph have some general vertices that they would can not be merged"() {
         given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
+        def graph = new DirectedGraphImpl<String, ExEdge<String>>({ source, target ->
             new ExEdge<String>(source: source, target: target)
         }).addVertex('v1').addVertex('v2').addEdge('v1', 'v2')
-        def source = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
+        def source = new DirectedGraphImpl<String, ExEdge<String>>({ source, target ->
             new ExEdge<String>(source: source, target: target)
         }).addVertex('v1').addVertex('v4')
 
         when:
-        graph.addGraph(source)
+        directedGraph.addGraph(source)
 
         then:
         thrown IllegalArgumentException
@@ -143,13 +185,13 @@ class DirectedGraphImplTest extends Specification {
 
     def "if two graph aren't implementing DirectedGraphImpl that they whould can not be merged"() {
         given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
+        def graph = new DirectedGraphImpl<String, ExEdge<String>>({ source, target ->
             new ExEdge<String>(source: source, target: target)
         }).addVertex('v1').addVertex('v2').addEdge('v1', 'v2')
         def source = Mock(Graph)
 
         when:
-        graph.addGraph(source)
+        directedGraph.addGraph(source)
 
         then:
         thrown IllegalArgumentException
@@ -157,12 +199,12 @@ class DirectedGraphImplTest extends Specification {
 
     def "vertexSet was returned from graph should be unmodifiable"() {
         given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>({source, target ->
+        def graph = new DirectedGraphImpl<String, ExEdge<String>>({ source, target ->
             new ExEdge<String>(source: source, target: target)
         }).addVertex('v1').addVertex('v2').addEdge('v1', 'v2')
 
         when:
-        graph.vertexSet().add('v3')
+        directedGraph.vertexSet().add('v3')
 
         then:
         thrown UnsupportedOperationException
@@ -171,13 +213,12 @@ class DirectedGraphImplTest extends Specification {
 
     def "graph has capability for test outgoing vertices for some vertex"() {
         given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>(ExEdge.metaClass.&invokeConstructor)
-        graph.addVertex('v1').addVertex('v2').addVertex('v3')
+        directedGraph.addVertex('v1').addVertex('v2').addVertex('v3')
                 .addEdge('v1', 'v2').addEdge('v1', 'v3')
 
         expect:
-        graph.containsOutgoingVertices('v1', 'v2', 'v3')
-        graph.containsIncomingVertices('v2', 'v1')
-        graph.containsIncomingVertices('v3', 'v1')
+        directedGraph.containsOutgoingVertices('v1', 'v2', 'v3')
+        directedGraph.containsIncomingVertices('v2', 'v1')
+        directedGraph.containsIncomingVertices('v3', 'v1')
     }
 }

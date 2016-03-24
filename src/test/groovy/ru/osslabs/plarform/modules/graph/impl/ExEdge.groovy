@@ -11,6 +11,19 @@ class ExEdge<T> implements Edge<T> {
     T source
     T target
 
+    ExEdge(List<T> args) {
+        this(args[0], args[1])
+    }
+
+    ExEdge(Map<String, T> args) {
+        this(args.source, args.target)
+    }
+
+    ExEdge(T source, T target) {
+        this.source = source
+        this.target = target
+    }
+
     @Override
     T getSource() {
         return source
