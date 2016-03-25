@@ -23,10 +23,10 @@ class BreadthFirstIterator<V, E extends Edge<V>> implements Graph<V, E>, Iterabl
 
     BreadthFirstIterator(Graph<V, E> graph) {
         Objects.requireNonNull(graph)
-        if (graph.vertexSet().isEmpty()) throw new IllegalArgumentException('Graph should have one or more vertices. Current graph haven\'t vertices')
+        if (graph.getVertices().isEmpty()) throw new IllegalArgumentException('Graph should have one or more getVertices. Current graph haven\'t getVertices')
 
         this.graph = graph
-        this.startVertex = graph.vertexSet().first()
+        this.startVertex = graph.getVertices().first()
     }
 
     BreadthFirstIterator(Graph<V, E> graph, V startVertex) {

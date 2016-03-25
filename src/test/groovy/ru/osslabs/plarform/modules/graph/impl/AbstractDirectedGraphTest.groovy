@@ -1,5 +1,6 @@
 package ru.osslabs.plarform.modules.graph.impl
 
+import ru.osslabs.plarform.modules.graph.DirectedGraph
 import ru.osslabs.plarform.modules.graph.Edge
 import ru.osslabs.plarform.modules.graph.GraphMap
 import spock.lang.Ignore
@@ -10,9 +11,10 @@ import java.util.function.BiFunction
 /**
  * Created by ikuchmin on 23.03.16.
  */
-class AbstractDirectedGraphTest extends Specification {
+abstract class AbstractDirectedGraphTest extends Specification {
 
-    def directedGraph = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+//    def directedGraph = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+    abstract DirectedGraph getDirectedGraph();
 
     def "graph should is capability add vertex"() {
         when:
@@ -133,6 +135,25 @@ class AbstractDirectedGraphTest extends Specification {
         thrown IllegalArgumentException
     }
 
+    def "if edge is in graph that graph should throw exception"() {
+        given:
+        def e1 = ['v3', 'v4'] as ExEdge
+        directedGraph.addVertices('v1', 'v2', 'v3', 'v4')
+                .addEdge('v1', 'v2').addEdge(e1)
+
+        when:
+        directedGraph.addEdge('v1', 'v2')
+
+        then:
+        thrown IllegalArgumentException
+
+        when:
+        directedGraph.addEdge(e1)
+
+        then:
+        thrown IllegalArgumentException
+    }
+
     @Ignore("It is bug in groovy https://issues.apache.org/jira/browse/GROOVY-7799")
     def "graph should is capability add edges of vertices as varargs"() {
         given:
@@ -206,6 +227,21 @@ class AbstractDirectedGraphTest extends Specification {
         thrown UnsupportedOperationException
     }
 
+    @Ignore("TODO")
+    def "if edge was added to graph that would it contains in graph"() {
+        given:
+        def graph = new DirectedGraphImpl<String, ExEdge<String>>({ source, target ->
+            new ExEdge<String>(source: source, target: target)
+        }).addVertex('v1').addVertex('v2')
+
+        when:
+        directedGraph.addEdge(new ExEdge<String>('v1', 'v2'))
+
+        then:
+        directedGraph.containsEdge(new ExEdge<String>('v1', 'v2'))
+    }
+
+
     def "graph should return collection of edges by vertex"() {
         given:
         def e1 = new ExEdge<>('v1', 'v2')
@@ -264,7 +300,34 @@ class AbstractDirectedGraphTest extends Specification {
         directedGraph.addVertices('v1', 'v2', 'v3')
 
         expect:
-        directedGraph.vertexSet().containsAll('v1', 'v2', 'v3')
+        directedGraph.vertices.containsAll('v1', 'v2', 'v3')
+
+    }
+
+    def "collection of vertex was returned from graph should be unmodifiable"() {
+        given:
+        directedGraph.addVertices('v1', 'v2')
+
+        when:
+        directedGraph.vertices.add('v3')
+
+        then:
+        thrown UnsupportedOperationException
+
+    }
+
+
+    def "graph should is capability add another directed graph into"() {
+        given:
+        directedGraph.addVertices('v1', 'v2', 'v3')
+        def source = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+                .addVertices('v4', 'v5', 'v6')
+
+        when:
+        directedGraph.addGraph(source)
+
+        then:
+        directedGraph.containsVertices('v1', 'v2', 'v3', 'v4', 'v5', 'v6') == [true, true, true, true, true, true]
 
     }
 
@@ -278,26 +341,32 @@ class AbstractDirectedGraphTest extends Specification {
         directedGraph.addGraph(source)
 
         then:
-        directedGraph.containsVertices('v1', 'v2', 'v3', 'v4')
+        directedGraph.containsVertices('v1', 'v2', 'v3', 'v4') == [true, true, true, true]
 
     }
 
-//    def "graph should is capability add another directed graph into"() {
-//        given:
-//        directedGraph.addVertices('v1', 'v2', 'v3').addEdge()
-//        def source = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
-//
-//
-//    }
-//
-//    def "if another source graph has equals vertices with this graph that vertices should be merged"() {
-//
-//
-//    }
+    def "all edges from source graph should be added to target graph"() {
+        given:
+        directedGraph.addVertices('v1', 'v2', 'v3')
+                .addEdge('v1', 'v2').addEdge('v1', 'v3')
+        def source = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+                .addVertices('v2', 'v3', 'v4')
+                .addEdge('v2', 'v3').addEdge('v2', 'v4')
+
+        when:
+        directedGraph.addGraph(source)
+
+        then:
+        directedGraph.containsVertices('v1', 'v2', 'v3', 'v4').every(true.&equals)
+        directedGraph.containsOutgoingVertices('v1', 'v2', 'v3').every(true.&equals)
+        directedGraph.containsOutgoingVertices('v2', 'v3', 'v4').every(true.&equals)
+        directedGraph.containsOutgoingVertices('v3', 'v2') == [false]
+        directedGraph.containsOutgoingVertices('v4', 'v2') == [false]
+    }
 
     class StubDirectClass<V, E extends Edge<V>> extends AbstractDirectedGraph<V, E> {
 
-        final GraphMap<V, DirectedEdgeContainer<V, E>> vertices = new SimpleGraphMap<>()
+        final GraphMap<V, DirectedEdgeContainer<V, E>> verticesMap = new SimpleGraphMap<>()
         BiFunction<V, V, E> edgeFactory
 
         StubDirectClass(BiFunction<V, V, E> edgeFactory) {
@@ -305,13 +374,13 @@ class AbstractDirectedGraphTest extends Specification {
         }
 
         @Override
-        BiFunction<V, V, E> edgeFactory() {
+        BiFunction<V, V, E> getEdgeFactory() {
             return this.edgeFactory
         }
 
         @Override
-        protected GraphMap<V, DirectedEdgeContainer<V, E>> graphMap() {
-            return vertices
+        protected GraphMap<V, DirectedEdgeContainer<V, E>> getGraphMap() {
+            return verticesMap
         }
     }
 }

@@ -39,7 +39,7 @@ class BreadthFirstIteratorTest extends Specification {
                 { parent, vertex -> vertex + '_suffix' })
 
         then:
-        newGraph.vertexSet().containsAll(['v1_suffix', 'v2_suffix', 'v3_suffix'])
+        newGraph.vertices.containsAll(['v1_suffix', 'v2_suffix', 'v3_suffix'])
         newGraph.edgesOf('v1_suffix').containsAll([
                 new ExEdge<>('v1_suffix', 'v2_suffix'),
                 new ExEdge<>('v1_suffix', 'v3_suffix')])
@@ -58,7 +58,7 @@ class BreadthFirstIteratorTest extends Specification {
                 {parent, vertex -> vertex} )
 
         then:
-        newGraph.vertexSet().containsAll(['v1', 'v2', 'v3'])
+        newGraph.vertices.containsAll(['v1', 'v2', 'v3'])
         newGraph.edgesOf('v1').containsAll([
                 new ExEdge<>('v1', 'v2'),
                 new ExEdge<>('v1', 'v3')])

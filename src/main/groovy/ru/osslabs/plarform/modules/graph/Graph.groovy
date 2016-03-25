@@ -39,16 +39,14 @@
  * 28-May-2006 : Moved connectivity info from edge to graph (JVS);
  *
  */
-package ru.osslabs.plarform.modules.graph;
+package ru.osslabs.plarform.modules.graph
 
-import java.util.Collection;
-import java.util.Set;
 import java.util.function.BiFunction;
 
 
 /**
  * The root interface in the graph hierarchy. A mathematical graph-theory graph
- * object <tt>G(V extends Vertex, E extend Edge)</tt> contains a set <tt>V</tt> of vertices and a set <tt>
+ * object <tt>G(V extends Vertex, E extend Edge)</tt> contains a set <tt>V</tt> of getVertices and a set <tt>
  * E</tt> of edges. Each edge e=(v1,v2) in E connects vertex v1 to vertex v2.
  * for more information about graphs and their related definitions see <a
  * href="http://mathworld.wolfram.com/Graph.html">
@@ -61,13 +59,13 @@ import java.util.function.BiFunction;
  * package <code>org.jgrapht.graph</code> provides a gallery of abstract and
  * concrete graph implementations.</p>
  * <p/>
- * <p>This library works best when vertices represent arbitrary objects and
+ * <p>This library works best when getVertices represent arbitrary objects and
  * edges represent the relationships between them. Vertex and edge instances may
  * be shared by more than one graph.</p>
  * <p/>
- * <p>Through generics, a graph can be typed to specific classes for vertices
+ * <p>Through generics, a graph can be typed to specific classes for getVertices
  * <code>V</code> and edges <code>E&lt;T&gt;</code>. Such a graph can contain
- * vertices of type <code>V</code> and all sub-types and Edges of type <code>
+ * getVertices of type <code>V</code> and all sub-types and Edges of type <code>
  * E</code> and all sub-types.</p>
  * <p/>
  * <p>For guidelines on vertex and edge classes, see <a
@@ -87,16 +85,16 @@ public interface Graph<V, E extends Edge<V>> {
      * from the specified source to the specified target, than this method does
      * not change the graph and returns <code>null</code>.
      * <p/>
-     * <p>The source and target vertices must already be contained in this
+     * <p>The source and target getVertices must already be contained in this
      * graph. If they are not found in graph IllegalArgumentException is
      * thrown.</p>
      * <p/>
      *
      * @param edge            edge to be added to this graph.
      * @return <code>this</code>
-     * @throws IllegalArgumentException if source or target vertices are not
+     * @throws IllegalArgumentException if source or target getVertices are not
      *                                  found in the graph.
-     * @throws NullPointerException     if any of the specified vertices is <code>
+     * @throws NullPointerException     if any of the specified getVertices is <code>
      *                                  null</code>.
      */
     Graph<V, E> addEdge(E edge);
@@ -108,16 +106,16 @@ public interface Graph<V, E extends Edge<V>> {
      * from the specified source to the specified target, than this method does
      * not change the graph and returns <code>null</code>.
      * <p/>
-     * <p>The source and target vertices must already be contained in this
+     * <p>The source and target getVertices must already be contained in this
      * graph. If they are not found in graph IllegalArgumentException is
      * thrown.</p>
      * <p/>
      *
      * @param edges            collection edge to be added to this graph.
      * @return <code>this</code>
-     * @throws IllegalArgumentException if source or target vertices are not
+     * @throws IllegalArgumentException if source or target getVertices are not
      *                                  found in the graph.
-     * @throws NullPointerException     if any of the specified vertices is <code>
+     * @throws NullPointerException     if any of the specified getVertices is <code>
      *                                  null</code>.
      */
     Graph<V, E> addEdges(Collection<E> edges);
@@ -131,7 +129,7 @@ public interface Graph<V, E extends Edge<V>> {
      *
      * @return the edge factory using which this graph creates new edges.
      */
-    BiFunction<V, V, E> edgeFactory();
+    BiFunction<V, V, E> getEdgeFactory();
 
     /**
      * Creates a new edge in this graph, going from the source vertex to the
@@ -140,7 +138,7 @@ public interface Graph<V, E extends Edge<V>> {
      * from the specified source to the specified target, than this method does
      * not change the graph and returns <code>null</code>.
      *
-     * <p>The source and target vertices must already be contained in this
+     * <p>The source and target getVertices must already be contained in this
      * graph. If they are not found in graph IllegalArgumentException is
      * thrown.</p>
      *
@@ -159,12 +157,12 @@ public interface Graph<V, E extends Edge<V>> {
      * @return The newly created edge if added to the graph, otherwise <code>
      * null</code>.
      *
-     * @throws IllegalArgumentException if source or target vertices are not
+     * @throws IllegalArgumentException if source or target getVertices are not
      * found in the graph.
-     * @throws NullPointerException if any of the specified vertices is <code>
+     * @throws NullPointerException if any of the specified getVertices is <code>
      * null</code>.
      *
-     * @see #edgeFactory()
+     * @see #getEdgeFactory()
      */
     Graph<V, E> addEdge(V sourceVertex, V targetVertex);
 
@@ -175,7 +173,7 @@ public interface Graph<V, E extends Edge<V>> {
      * u.equals(v)</code>. If this graph already contains such vertex, the call
      * leaves this graph unchanged and returns <tt>false</tt>. In combination
      * with the restriction on constructors, this ensures that graphs never
-     * contain duplicate vertices.
+     * contain duplicate getVertices.
      *
      * @param v vertex to be added to this graph.
      * @return <code>this</code>
@@ -189,7 +187,7 @@ public interface Graph<V, E extends Edge<V>> {
     Graph<V, E> addVertices(Collection<V> vertices);
 
     /**
-     * Adds all the vertices and all the edges of the {@code sourceGraph} to the
+     * Adds all the getVertices and all the edges of the {@code sourceGraph} to the
      * graph being built.
      *
      * @return this object
@@ -236,7 +234,7 @@ public interface Graph<V, E extends Edge<V>> {
     Collection<E> edgesOf(V vertex);
 
     /**
-     * Returns a set of the vertices contained in this graph. The set is backed
+     * Returns a set of the getVertices contained in this graph. The set is backed
      * by the graph, so changes to the graph are reflected in the set. If the
      * graph is modified while an iteration over the set is in progress, the
      * results of the iteration are undefined.
@@ -246,7 +244,7 @@ public interface Graph<V, E extends Edge<V>> {
      * this is not required. It is the responsibility of callers who rely on
      * this behavior to only use graph implementations which support it.</p>
      *
-     * @return a set view of the vertices contained in this graph.
+     * @return a set view of the getVertices contained in this graph.
      */
-    Collection<V> vertexSet();
+    Collection<V> getVertices();
 }

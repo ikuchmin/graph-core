@@ -1,11 +1,13 @@
 package ru.osslabs.plarform.modules.graph.impl
 
 import groovy.transform.CompileStatic
+import groovy.transform.ToString
 import ru.osslabs.plarform.modules.graph.GraphMap
 
 /**
  * Created by ikuchmin on 23.03.16.
  */
+@ToString
 @CompileStatic
 class SimpleGraphMap<K, V> implements GraphMap<K, V> {
     @Delegate(interfaces = false, includes = ['containsKey', 'keySet', 'entrySet'])
@@ -34,4 +36,6 @@ class SimpleGraphMap<K, V> implements GraphMap<K, V> {
     Iterator<Map.Entry<K, V>> iterator() {
         return map.entrySet().iterator()
     }
+
+
 }

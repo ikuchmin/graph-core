@@ -19,15 +19,17 @@ abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends AbstractGraph
     public DirectedGraph<V, E> addEdge(E edge) {
         if (edge == null) throw new IllegalArgumentException("Edge equals null");
 
-        Optional<DirectedEdgeContainer<V, E>> src = graphMap().get(edge.getSource());
-        Optional<DirectedEdgeContainer<V, E>> trg = graphMap().get(edge.getTarget());
+        Optional<DirectedEdgeContainer<V, E>> src = graphMap.get(edge.getSource());
+        Optional<DirectedEdgeContainer<V, E>> trg = graphMap.get(edge.getTarget());
 
-        if (src.isPresent() && trg.isPresent()) {
-            src.get().addOutgoingEdge(edge);
-            trg.get().addIncomingEdge(edge);
-        } else
+        if (src.isPresent() && src.get().outgoingEdges.contains(edge))
+            throw new IllegalArgumentException("Edge (%s) contains in graph. This is collision.")
+        if (!src.isPresent() || !trg.isPresent())
             throw new IllegalArgumentException(format("Vertex not found in graph. Source: %s, Target: %s",
                     edge.getSource(), edge.getTarget()));
+
+        src.get().addOutgoingEdge(edge);
+        trg.get().addIncomingEdge(edge);
 
         return this;
     }
@@ -50,17 +52,17 @@ abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends AbstractGraph
         if (sourceVertex == null) throw new IllegalArgumentException("Source vertex equals null");
         if (targetVertex == null) throw new IllegalArgumentException("Source vertex equals null");
 
-        return addEdge(edgeFactory().apply(sourceVertex, targetVertex));
+        return addEdge(getEdgeFactory().apply(sourceVertex, targetVertex));
     }
 
     @Override
     public DirectedGraph<V, E> addVertex(V vertex) {
-        if (vertex == null) throw new IllegalArgumentException("Vertex equals null");
-        if (graphMap().containsKey(vertex)) throw new IllegalArgumentException(format("Vertex with name %s has in graph. This is collision", vertex));
+        if (vertex == null) throw new IllegalArgumentException("Vertex equals null")
+        if (graphMap.containsKey(vertex)) throw new IllegalArgumentException(format("Vertex with name %s has in graph. This is collision", vertex));
 
-        graphMap().put(vertex, new DirectedEdgeContainer<>(vertex));
+        graphMap.put(vertex, new DirectedEdgeContainer<>(vertex))
 
-        return this;
+        return this
     }
 
     @Override
@@ -70,33 +72,23 @@ abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends AbstractGraph
 
     @Override
     public DirectedGraph<V, E> addVertices(Collection<V> vertices) {
-        if (vertices.contains(null)) throw new IllegalArgumentException("Collection of vertices can not contains null vertices")
+        if (vertices.contains(null)) throw new IllegalArgumentException("Collection of getVertices can not contains null getVertices")
 
         vertices.each(this.&addVertex)
         return this
     }
 
-
-//    @Override
-//    @SuppressWarnings("unchecked")
-//    public Graph<V, E> addGraph(Graph<? extends V, ? extends E> sourceGraph) {
-//        if (this == sourceGraph) return this;
-//        if (!(sourceGraph instanceof DirectedGraphImpl))
-//            throw new IllegalArgumentException("Source graph isn't implementing DirectedGraphImpl");
-//
-//        DirectedGraphImpl<V, E> that = (DirectedGraphImpl<V, E>) sourceGraph;
-//
-//        for (V key : vertices.keySet())
-//            if (vertices.keySet().contains(key))
-//                throw new IllegalArgumentException("This graph and source graph aren't contains some general vertices");
-//
-//        vertices.putAll(that.vertices);
-//        return this;
-//    }
-
     @Override
     public Graph<V, E> addGraph(Graph<? extends V, ? extends E> sourceGraph) {
-        return null;
+        sourceGraph.vertices
+                .findAll { v -> !containsVertex(v) }
+                .each(this.&addVertex)
+
+        sourceGraph.vertices
+                .collect(sourceGraph.&edgesOf)
+                .each(this.&addEdges)
+
+        return this
     }
 
     @Override
@@ -106,7 +98,7 @@ abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends AbstractGraph
 
     @Override
     public boolean containsVertex(V v) {
-        return graphMap().containsKey(v);
+        return graphMap.containsKey(v);
     }
 
     @Override
@@ -118,11 +110,11 @@ abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends AbstractGraph
     List<Boolean> containsVertices(List<V> vertices) {
         if (vertices == null) return [false]
 
-        return vertices.collect(graphMap().&containsKey)
+        return vertices.collect(graphMap.&containsKey)
     }
 
     List<Boolean> containsVertices(V vertex, List<V> vertices, Closure<Collection<V>> fnVertices) {
-        Optional<DirectedEdgeContainer<V, E>> directedEdge = graphMap().get(vertex);
+        Optional<DirectedEdgeContainer<V, E>> directedEdge = graphMap.get(vertex);
 
         if (!directedEdge.isPresent()) {
             def arr = new Boolean[vertices.size()]
@@ -141,7 +133,8 @@ abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends AbstractGraph
     @Override
     public List<Boolean> containsOutgoingVertices(V vertex, List<V> vertices) {
         return containsVertices(vertex, vertices, { DirectedEdgeContainer<V, E> container ->
-            container.getUnmodifiableOutgoingVertices() })
+            container.getOutgoingVertices()
+        })
     }
 
     @Override
@@ -152,7 +145,8 @@ abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends AbstractGraph
     @Override
     public List<Boolean> containsIncomingVertices(V vertex, List<V> vertices) {
         return containsVertices(vertex, vertices, { DirectedEdgeContainer<V, E> container ->
-            container.getUnmodifiableIncomingVertices() })
+            container.getIncomingVertices()
+        })
     }
 
 
@@ -163,30 +157,31 @@ abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends AbstractGraph
 
     @Override
     public Collection<E> incomingEdgesOf(V vertex) {
-        def edge = graphMap().get(vertex)
+        def edge = graphMap.get(vertex)
         if (!edge.isPresent()) return []
-        return edge.get().unmodifiableIncomingEdges
+        return edge.get().incomingEdges
 
     }
 
     @Override
     public Collection<E> outgoingEdgesOf(V vertex) {
-        def edge = graphMap().get(vertex)
+        def edge = graphMap.get(vertex)
         if (!edge.isPresent()) return []
-        return edge.get().unmodifiableOutgoingEdges
+        return edge.get().outgoingEdges
     }
 
     @Override
-    public Collection<V> vertexSet() {
-        return graphMap().keySet();
+    public Collection<V> getVertices() {
+        return graphMap.keySet();
     }
 
-    protected abstract GraphMap<V, DirectedEdgeContainer<V, E>> graphMap();
+    protected abstract GraphMap<V, DirectedEdgeContainer<V, E>> getGraphMap();
 }
 
 /**
  * A container for vertex edges.
  */
+@CompileStatic
 public class DirectedEdgeContainer<VV, EE extends Edge<VV>> {
     private final VV vertex;
     private final Map<VV, EE> incoming = new HashMap<>();
@@ -196,20 +191,20 @@ public class DirectedEdgeContainer<VV, EE extends Edge<VV>> {
         this.vertex = vertex;
     }
 
-    public Collection<VV> getUnmodifiableIncomingVertices() {
-        return Collections.unmodifiableSet(incoming.keySet());
+    public Collection<VV> getIncomingVertices() {
+        return incoming.keySet();
     }
 
-    public Collection<VV> getUnmodifiableOutgoingVertices() {
-        return Collections.unmodifiableSet(outgoing.keySet());
+    public Collection<VV> getOutgoingVertices() {
+        return outgoing.keySet();
     }
 
-    public Collection<EE> getUnmodifiableIncomingEdges() {
-        return Collections.unmodifiableCollection(incoming.values());
+    public Collection<EE> getIncomingEdges() {
+        return incoming.values();
     }
 
-    public Collection<EE> getUnmodifiableOutgoingEdges() {
-        return Collections.unmodifiableCollection(outgoing.values());
+    public Collection<EE> getOutgoingEdges() {
+        return outgoing.values();
     }
 
     public void addIncomingEdge(EE edge) {
