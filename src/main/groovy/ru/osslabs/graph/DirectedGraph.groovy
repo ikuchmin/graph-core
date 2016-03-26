@@ -1,9 +1,4 @@
-package ru.osslabs.plarform.modules.graph;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
+package ru.osslabs.graph
 /**
  * Created by ikuchmin on 03.03.16.
  */

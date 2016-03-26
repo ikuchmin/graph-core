@@ -1,10 +1,10 @@
-package ru.osslabs.plarform.modules.graph.impl
+package ru.osslabs.graph.impl
 
 import groovy.transform.CompileStatic
-import ru.osslabs.plarform.modules.graph.DirectedGraph
-import ru.osslabs.plarform.modules.graph.Edge
-import ru.osslabs.plarform.modules.graph.Graph
-import ru.osslabs.plarform.modules.graph.GraphMap
+import ru.osslabs.graph.DirectedGraph
+import ru.osslabs.graph.Edge
+import ru.osslabs.graph.Graph
+import ru.osslabs.graph.GraphMap
 
 import static java.lang.String.format
 import static java.util.Arrays.asList

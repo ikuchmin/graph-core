@@ -1,4 +1,4 @@
-package ru.osslabs.plarform.modules.graph;
+package ru.osslabs.graph;
 
 /**
  * Created by ikuchmin on 03.03.16.

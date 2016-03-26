@@ -1,15 +1,15 @@
-package ru.osslabs.plarform.modules.graph.impl
+package ru.osslabs.graph.impl
 
 import groovy.transform.CompileStatic
-import ru.osslabs.plarform.modules.graph.Edge
-import ru.osslabs.plarform.modules.graph.Graph
+import ru.osslabs.graph.Edge
+import ru.osslabs.graph.Graph
 
 import java.util.function.BiFunction
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
 
-import static ru.osslabs.plarform.modules.graph.impl.BreadthFirstIterator.Itr.VisitColor.GRAY
-import static ru.osslabs.plarform.modules.graph.impl.BreadthFirstIterator.Itr.VisitColor.WHITE
+import static ru.osslabs.graph.impl.BreadthFirstIterator.Itr.VisitColor.GRAY
+import static ru.osslabs.graph.impl.BreadthFirstIterator.Itr.VisitColor.WHITE
 
 /**
  * Created by ikuchmin on 16.03.16.

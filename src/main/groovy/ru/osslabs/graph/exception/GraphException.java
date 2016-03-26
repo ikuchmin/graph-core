@@ -1,4 +1,4 @@
-package ru.osslabs.plarform.modules.graph.exception;
+package ru.osslabs.graph.exception;
 
 /**
  * Created by ikuchmin on 04.03.16.

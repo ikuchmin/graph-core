@@ -1,13 +1,9 @@
-package ru.osslabs.plarform.modules.graph.impl
+package ru.osslabs.graph.impl
 
-import groovy.transform.CompileStatic;
-import ru.osslabs.plarform.modules.graph.DirectedGraph;
-import ru.osslabs.plarform.modules.graph.Edge;
-import ru.osslabs.plarform.modules.graph.Graph;
-import ru.osslabs.plarform.modules.graph.GraphMap;
+import groovy.transform.CompileStatic
+import ru.osslabs.graph.Edge
+import ru.osslabs.graph.GraphMap
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 /**

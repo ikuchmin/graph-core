@@ -1,6 +1,6 @@
-package ru.osslabs.plarform.modules.graph.impl
+package ru.osslabs.graph.impl
 
-import ru.osslabs.plarform.modules.graph.DirectedGraph
+import ru.osslabs.graph.DirectedGraph
 
 /**
  * Created by ikuchmin on 09.03.16.

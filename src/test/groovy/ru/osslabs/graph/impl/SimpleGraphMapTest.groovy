@@ -1,4 +1,4 @@
-package ru.osslabs.plarform.modules.graph.impl
+package ru.osslabs.graph.impl
 
 import spock.lang.Specification
 

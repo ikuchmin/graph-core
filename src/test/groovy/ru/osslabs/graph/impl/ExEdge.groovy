@@ -1,7 +1,7 @@
-package ru.osslabs.plarform.modules.graph.impl
+package ru.osslabs.graph.impl
 
 import groovy.transform.Canonical
-import ru.osslabs.plarform.modules.graph.Edge
+import ru.osslabs.graph.Edge
 
 /**
  * Created by ikuchmin on 14.03.16.

@@ -39,7 +39,7 @@
  * 28-May-2006 : Moved connectivity info from edge to graph (JVS);
  *
  */
-package ru.osslabs.plarform.modules.graph
+package ru.osslabs.graph
 
 import java.util.function.BiFunction;
 

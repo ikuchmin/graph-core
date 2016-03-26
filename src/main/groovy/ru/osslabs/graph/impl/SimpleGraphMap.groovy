@@ -1,8 +1,8 @@
-package ru.osslabs.plarform.modules.graph.impl
+package ru.osslabs.graph.impl
 
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
-import ru.osslabs.plarform.modules.graph.GraphMap
+import ru.osslabs.graph.GraphMap
 
 /**
  * Created by ikuchmin on 23.03.16.
