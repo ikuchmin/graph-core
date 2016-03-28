@@ -216,26 +216,12 @@ abstract class AbstractDirectedGraphTest extends Specification {
         directedGraph.containsIncomingVertices('v3', 'v1') == [true]
     }
 
-    def "graph hasn't capability test contains edge"() {
-        given:
-        directedGraph.addVertices('v1', 'v2').addEdge('v1', 'v2')
-
-        when:
-        directedGraph.containsEdge(new ExEdge<>('v1', 'v2'))
-
-        then:
-        thrown UnsupportedOperationException
-    }
-
-    @Ignore("TODO")
     def "if edge was added to graph that would it contains in graph"() {
         given:
-        def graph = new DirectedGraphImpl<String, ExEdge<String>>({ source, target ->
-            new ExEdge<String>(source: source, target: target)
-        }).addVertex('v1').addVertex('v2')
+        directedGraph.addVertex('v1').addVertex('v2')
 
         when:
-        directedGraph.addEdge(new ExEdge<String>('v1', 'v2'))
+        directedGraph.addEdge('v1', 'v2')
 
         then:
         directedGraph.containsEdge(new ExEdge<String>('v1', 'v2'))
@@ -362,6 +348,26 @@ abstract class AbstractDirectedGraphTest extends Specification {
         directedGraph.containsOutgoingVertices('v2', 'v3', 'v4').every(true.&equals)
         directedGraph.containsOutgoingVertices('v3', 'v2') == [false]
         directedGraph.containsOutgoingVertices('v4', 'v2') == [false]
+    }
+
+    def "if two graph have some equality vertices or edges that target graph should resolve conflicts"() {
+        given:
+        directedGraph.addVertices('v1', 'v2', 'v3')
+                .addEdge('v1', 'v2').addEdge('v1', 'v3')
+        def source = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+                .addVertices('v1', 'v2', 'v3', 'v4')
+                .addEdge('v1', 'v2').addEdge('v2', 'v3').addEdge('v2', 'v4')
+
+        when:
+        directedGraph.addGraph(source)
+
+        then:
+        directedGraph.containsVertices('v1', 'v2', 'v3', 'v4').every(true.&equals)
+        directedGraph.containsOutgoingVertices('v1', 'v2', 'v3').every(true.&equals)
+        directedGraph.containsOutgoingVertices('v2', 'v3', 'v4').every(true.&equals)
+        directedGraph.containsOutgoingVertices('v3', 'v2') == [false]
+        directedGraph.containsOutgoingVertices('v4', 'v2') == [false]
+
     }
 
     class StubDirectClass<V, E extends Edge<V>> extends AbstractDirectedGraph<V, E> {

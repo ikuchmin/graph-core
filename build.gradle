@@ -37,15 +37,17 @@ repositories {
 //}
 
 dependencies {
-    provided "org.projectlombok:lombok:1.16.8"
+    compile "org.projectlombok:lombok:1.16.8"
     testCompile 'org.codehaus.groovy:groovy-all:2.4.6'
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }
 
-task delombok(type: JavaExec) {
-    classpath = sourceSets.main.runtimeClasspath
-    main
-}
+//task delombok(type: JavaExec) {
+//    classpath = configurations.compile
+//    main = "lombok.launch.Main"
+//    args = [ "delombok", "--quiet", "src/main/java", "--target", "delombok" ]
+//}
+
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
