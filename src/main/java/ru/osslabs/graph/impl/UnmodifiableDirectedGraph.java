@@ -13,26 +13,37 @@ import java.util.function.BiFunction;
 /**
  * Created by ikuchmin on 14.03.16.
  */
-public class UnmodifiableDirectedGraph<V, E extends Edge<V>>
-        extends UnmodifiableGraph<V, E>
-        implements DirectedGraph<V, E> {
+public class UnmodifiableDirectedGraph<V, E extends Edge<V>, G extends DirectedGraph<V, E, G>>
+        extends UnmodifiableGraph<V, E, G>
+        implements DirectedGraph<V, E, G> {
 
-    private DirectedGraph<V, E> directedGraph;
+    private DirectedGraph<V, E, G> directedGraph;
 
-    public UnmodifiableDirectedGraph(DirectedGraph<V, E> directedGraph) {
+    public UnmodifiableDirectedGraph(DirectedGraph<V, E, G> directedGraph) {
         super(directedGraph);
         this.directedGraph = directedGraph;
     }
 
     // boilerplate
+
     @Override
     public Collection<E> incomingEdgesOf(V vertex) {
         return directedGraph.incomingEdgesOf(vertex);
     }
 
     @Override
+    public Collection<V> incomingVerticesOf(V vertex) {
+        return directedGraph.incomingVerticesOf(vertex);
+    }
+
+    @Override
     public Collection<E> outgoingEdgesOf(V vertex) {
         return directedGraph.outgoingEdgesOf(vertex);
+    }
+
+    @Override
+    public Collection<V> outgoingVerticesOf(V vertex) {
+        return directedGraph.outgoingVerticesOf(vertex);
     }
 
     @Override
@@ -56,37 +67,7 @@ public class UnmodifiableDirectedGraph<V, E extends Edge<V>>
     }
 
     @Override
-    public BiFunction<V, V, E> getEdgeFactory() {
-        return directedGraph.getEdgeFactory();
-    }
-
-    @Override
-    public boolean containsEdge(E e) {
-        return directedGraph.containsEdge(e);
-    }
-
-    @Override
-    public boolean containsVertex(V v) {
-        return directedGraph.containsVertex(v);
-    }
-
-    @Override
-    public List<Boolean> containsVertices(V... v) {
-        return directedGraph.containsVertices(v);
-    }
-
-    @Override
-    public List<Boolean> containsVertices(List<? extends V> v) {
-        return directedGraph.containsVertices(v);
-    }
-
-    @Override
-    public Collection<E> edgesOf(V vertex) {
-        return directedGraph.edgesOf(vertex);
-    }
-
-    @Override
-    public Collection<V> getVertices() {
-        return directedGraph.getVertices();
+    public boolean containsAllEdges(E... edges) {
+        return directedGraph.containsAllEdges(edges);
     }
 }

@@ -14,14 +14,14 @@ import static ru.osslabs.graph.impl.BreadthFirstIterator.VisitColor.WHITE;
 /**
  * Created by ikuchmin on 16.03.16.
  */
-public class BreadthFirstIterator<V, E extends Edge<V>> implements Graph<V, E>, Iterable<E> {
+public class BreadthFirstIterator<V, E extends Edge<V>, G extends Graph<V, E, G>> implements Graph<V, E, G>, Iterable<E> {
 //    @Delegate(types = {GraphReadOperations.class, GraphModifyOperations.class})
-    private final Graph<V, E> graph;
+    private final Graph<V, E, G> graph;
 
     private final V startVertex;
 
 
-    public BreadthFirstIterator(Graph<V, E> graph) {
+    public BreadthFirstIterator(Graph<V, E, G> graph) {
         Objects.requireNonNull(graph);
         if (graph.getVertices().isEmpty())
             throw new IllegalArgumentException("Graph should have one or more getVertices. Current graph haven't getVertices");
@@ -30,7 +30,7 @@ public class BreadthFirstIterator<V, E extends Edge<V>> implements Graph<V, E>, 
         this.startVertex = graph.getVertices().stream().findFirst().get();
     }
 
-    public BreadthFirstIterator(Graph<V, E> graph, V startVertex) {
+    public BreadthFirstIterator(Graph<V, E, G> graph, V startVertex) {
         this.graph = graph;
         this.startVertex = startVertex;
     }
@@ -79,7 +79,7 @@ public class BreadthFirstIterator<V, E extends Edge<V>> implements Graph<V, E>, 
         return StreamSupport.stream(spliterator(), false);
     }
 
-    public <R, EE extends Edge<R>, G extends Graph<R, EE>> G collectVertices(V startVertex,
+    public <R, EE extends Edge<R>, G extends Graph<R, EE, G>> G collectVertices(V startVertex,
                                                                              G collector,
                                                                              BiFunction<Optional<R>, V, R> mapper) {
 
@@ -144,11 +144,69 @@ public class BreadthFirstIterator<V, E extends Edge<V>> implements Graph<V, E>, 
     }
 
     //boilerplate
+    @Override
+    public G addEdge(E edge) {
+        return graph.addEdge(edge);
+    }
 
+    @Override
+    public G addEdges(Collection<? extends E> edges) {
+        return graph.addEdges(edges);
+    }
+
+    @Override
+    public G addEdge(V sourceVertex, V targetVertex) {
+        return graph.addEdge(sourceVertex, targetVertex);
+    }
+
+    @Override
+    public G addVertex(V v) {
+        return graph.addVertex(v);
+    }
+
+    @Override
+    public G addVertices(V... vertices) {
+        return graph.addVertices(vertices);
+    }
+
+    @Override
+    public G addVertices(Collection<? extends V> vertices) {
+        return graph.addVertices(vertices);
+    }
+
+    @Override
+    public G addGraph(Graph<V, E, G> sourceGraph) {
+        return graph.addGraph(sourceGraph);
+    }
 
     @Override
     public BiFunction<V, V, E> getEdgeFactory() {
         return graph.getEdgeFactory();
+    }
+
+    @Override
+    public boolean containsVertex(V vertex) {
+        return graph.containsVertex(vertex);
+    }
+
+    @Override
+    public boolean containsAllVertices(V... vertex) {
+        return graph.containsAllVertices(vertex);
+    }
+
+    @Override
+    public boolean containsAllVertices(Collection<? extends V> vertices) {
+        return graph.containsAllVertices(vertices);
+    }
+
+    @Override
+    public List<Boolean> containsVertices(V... vertices) {
+        return graph.containsVertices(vertices);
+    }
+
+    @Override
+    public List<Boolean> containsVertices(List<? extends V> vertices) {
+        return graph.containsVertices(vertices);
     }
 
     @Override
@@ -157,18 +215,18 @@ public class BreadthFirstIterator<V, E extends Edge<V>> implements Graph<V, E>, 
     }
 
     @Override
-    public boolean containsVertex(V v) {
-        return graph.containsVertex(v);
+    public boolean containsAllEdges(E... edges) {
+        return graph.containsAllEdges(edges);
     }
 
     @Override
-    public List<Boolean> containsVertices(V... v) {
-        return graph.containsVertices(v);
+    public boolean containsAllEdges(Collection<? extends E> edges) {
+        return graph.containsAllEdges(edges);
     }
 
     @Override
-    public List<Boolean> containsVertices(List<? extends V> v) {
-        return graph.containsVertices(v);
+    public boolean containGraph(Graph<V, E, G> graph) {
+        return this.graph.containGraph(graph);
     }
 
     @Override
@@ -177,42 +235,12 @@ public class BreadthFirstIterator<V, E extends Edge<V>> implements Graph<V, E>, 
     }
 
     @Override
+    public Collection<E> getEdges() {
+        return graph.getEdges();
+    }
+
+    @Override
     public Collection<V> getVertices() {
         return graph.getVertices();
-    }
-
-    @Override
-    public Graph<V, E> addEdge(E edge) {
-        return graph.addEdge(edge);
-    }
-
-    @Override
-    public Graph<V, E> addEdges(Collection<? extends E> edges) {
-        return graph.addEdges(edges);
-    }
-
-    @Override
-    public Graph<V, E> addEdge(V sourceVertex, V targetVertex) {
-        return graph.addEdge(sourceVertex, targetVertex);
-    }
-
-    @Override
-    public Graph<V, E> addVertex(V v) {
-        return graph.addVertex(v);
-    }
-
-    @Override
-    public Graph<V, E> addVertices(V... vertices) {
-        return graph.addVertices(vertices);
-    }
-
-    @Override
-    public Graph<V, E> addVertices(Collection<? extends V> vertices) {
-        return graph.addVertices(vertices);
-    }
-
-    @Override
-    public Graph<V, E> addGraph(Graph<V, E> sourceGraph) {
-        return graph.addGraph(sourceGraph);
     }
 }

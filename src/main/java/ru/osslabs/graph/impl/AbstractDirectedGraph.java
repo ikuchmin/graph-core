@@ -3,22 +3,29 @@ package ru.osslabs.graph.impl;
 import ru.osslabs.graph.DirectedGraph;
 import ru.osslabs.graph.Edge;
 import ru.osslabs.graph.Graph;
-import ru.osslabs.graph.GraphMap;
+import ru.osslabs.graph.collection.GraphMap;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by ikuchmin on 03.03.16.
  */
-public abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends AbstractGraph<V, E> implements DirectedGraph<V, E> {
+public abstract class AbstractDirectedGraph<V, E extends Edge<V>, G extends DirectedGraph<V, E, G>,
+        GM extends GraphMap<V, DirectedEdgeContainer<V, E>, GM>>
+        extends AbstractGraph<V, E, G> implements DirectedGraph<V, E, G> {
 
     @Override
-    public DirectedGraph<V, E> addEdge(E edge) {
+    @SuppressWarnings("unchecked")
+    public G addEdge(E edge) {
         if (edge == null) throw new IllegalArgumentException("Edge equals null");
 
         Optional<DirectedEdgeContainer<V, E>> src = getGraphMap().get(edge.getSource());
@@ -33,7 +40,7 @@ public abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends Abstra
         src.get().addOutgoingEdge(edge);
         trg.get().addIncomingEdge(edge);
 
-        return this;
+        return (G) this;
     }
 
     // FIXME: Bug in groovy https://issues.apache.org/jira/browse/GROOVY-7799
@@ -43,14 +50,15 @@ public abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends Abstra
 //    }
 
     @Override
-    public DirectedGraph<V, E> addEdges(Collection<? extends E> edges) {
+    @SuppressWarnings("unchecked")
+    public G addEdges(Collection<? extends E> edges) {
         if (edges.contains(null)) throw new IllegalArgumentException("Collection of edges can not contains null edge");
         edges.forEach(this::addEdge);
-        return this;
+        return (G) this;
     }
 
     @Override
-    public DirectedGraph<V, E> addEdge(V sourceVertex, V targetVertex) {
+    public G addEdge(V sourceVertex, V targetVertex) {
         if (sourceVertex == null) throw new IllegalArgumentException("Source vertex equals null");
         if (targetVertex == null) throw new IllegalArgumentException("Source vertex equals null");
 
@@ -58,33 +66,38 @@ public abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends Abstra
     }
 
     @Override
-    public DirectedGraph<V, E> addVertex(V vertex) {
+    @SuppressWarnings("unchecked")
+    public G addVertex(V vertex) {
         if (vertex == null) throw new IllegalArgumentException("Vertex equals null");
         if (getGraphMap().containsKey(vertex))
             throw new IllegalArgumentException(format("Vertex with name %s has in graph. This is collision", vertex));
 
         getGraphMap().put(vertex, new DirectedEdgeContainer<>(vertex));
 
-        return this;
+        return (G) this;
     }
 
     @Override
-    public DirectedGraph<V, E> addVertices(V... vertices) {
+    public G addVertices(V... vertices) {
         return addVertices(asList(vertices));
     }
 
     @Override
-    public DirectedGraph<V, E> addVertices(Collection<? extends V> vertices) {
+    @SuppressWarnings("unchecked")
+    public G addVertices(Collection<? extends V> vertices) {
         if (vertices.contains(null))
             throw new IllegalArgumentException("Collection of getVertices can not contains null getVertices");
 
         vertices.forEach(this::addVertex);
-        return this;
+        return (G) this;
     }
 
-    @Override
-    public Graph<V, E> addGraph(Graph<V, E> sourceGraph) {
-        Collection<V> srcGraphVertices = sourceGraph.getVertices();
+    // TODO: If you try use wildcard ? extends V, ? extends E that you get exception. I don't why.
+//    @Override
+    @SuppressWarnings("unchecked")
+    public G addGraph(Graph<V, E, G> sourceGraph) {
+        if (sourceGraph == null) return (G) this;
+        Collection<? extends V> srcGraphVertices = sourceGraph.getVertices();
         srcGraphVertices.stream()
                 .filter(v -> !containsVertex(v))
                 .forEach(this::addVertex);
@@ -95,7 +108,7 @@ public abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends Abstra
                 .filter(e -> !containsEdge(e))
                 .forEach(this::addEdge);
 
-        return this;
+        return (G) this;
     }
 
     @Override
@@ -109,30 +122,58 @@ public abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends Abstra
     }
 
     @Override
+    public boolean containsAllVertices(V... vertices) {
+        return containsAllVertices(asList(vertices));
+    }
+
+    @Override
+    public boolean containsAllVertices(Collection<? extends V> vertices) {
+        return getGraphMap().containsAllKey(vertices);
+    }
+
+    @Override
     public List<Boolean> containsVertices(V... vertices) {
         return containsVertices(asList(vertices));
     }
 
     @Override
     public List<Boolean> containsVertices(List<? extends V> vertices) {
-        if (vertices == null) return Collections.singletonList(false);
+        if (vertices == null || vertices.isEmpty()) return Collections.singletonList(true);
 
-        return vertices.stream().map(getGraphMap()::containsKey).collect(Collectors.toList());
+        return vertices.stream().map(getGraphMap()::containsKey).collect(toList());
     }
 
-    List<Boolean> containsVertices(V vertex, List<? extends V> vertices,
-                                   Function<DirectedEdgeContainer<V, E>, Collection<V>> fnVertices) {
+    protected List<Boolean> containsVertices(V vertex, List<? extends V> vertices,
+                                             Function<DirectedEdgeContainer<V, E>, Collection<V>> fnVertices) {
         Optional<DirectedEdgeContainer<V, E>> directedEdge = getGraphMap().get(vertex);
 
-        if (!directedEdge.isPresent()) {
-            Boolean[] arr = new Boolean[vertices.size()];
-            Arrays.fill(arr, false);
-            return Arrays.asList(arr);
-        }
+        if (!directedEdge.isPresent()) return vertices.parallelStream().map(v -> false).collect(toList());
 
         return vertices.stream()
                 .map(fnVertices.apply(directedEdge.get())::contains)
+                .collect(toList());
+    }
+
+    @Override
+    public boolean containGraph(Graph<V, E, G> graph) {
+        return containsAllVertices(graph.getVertices()) && containsAllEdges(graph.getEdges());
+    }
+
+    @Override
+    public boolean containsAllEdges(E... edges) {
+        return containsAllEdges(asList(edges));
+    }
+
+    @Override
+    public boolean containsAllEdges(Collection<? extends E> edges) {
+        if (edges == null || edges.isEmpty()) return true;
+
+        Collection<? extends E> edg = edges;
+        if (edges.contains(null)) edg = edges.stream()
+                .filter(e -> e != null)
                 .collect(Collectors.toList());
+
+        return getEdges().containsAll(edg);
     }
 
     @Override
@@ -162,11 +203,27 @@ public abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends Abstra
     }
 
     @Override
+    public Collection<E> getEdges() {
+        return getGraphMap().values().stream()
+                .flatMap(e -> e.getOutgoingEdges().stream())
+                .collect(Collectors.toList());
+    }
+
+    ;
+
+    @Override
     public Collection<E> incomingEdgesOf(V vertex) {
         Optional<DirectedEdgeContainer<V, E>> edge = getGraphMap().get(vertex);
         if (!edge.isPresent()) return Collections.emptyList();
         return edge.get().getIncomingEdges();
 
+    }
+
+    @Override
+    public Collection<V> incomingVerticesOf(V vertex) {
+        Optional<DirectedEdgeContainer<V, E>> edge = getGraphMap().get(vertex);
+        if (!edge.isPresent()) return Collections.emptyList();
+        return edge.get().getIncomingVertices();
     }
 
     @Override
@@ -177,9 +234,16 @@ public abstract class AbstractDirectedGraph<V, E extends Edge<V>> extends Abstra
     }
 
     @Override
-    public Collection<V> getVertices() {
-        return getGraphMap().keySet();
+    public Collection<V> outgoingVerticesOf(V vertex) {
+        Optional<DirectedEdgeContainer<V, E>> edge = getGraphMap().get(vertex);
+        if (!edge.isPresent()) return Collections.emptyList();
+        return edge.get().getOutgoingVertices();
     }
 
-    protected abstract GraphMap<V, DirectedEdgeContainer<V, E>> getGraphMap();
+    @Override
+    public Collection<V> getVertices() {
+        return getGraphMap().keys();
+    }
+
+    protected abstract GM getGraphMap();
 }

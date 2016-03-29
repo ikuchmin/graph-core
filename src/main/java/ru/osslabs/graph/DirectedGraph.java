@@ -6,7 +6,8 @@ import java.util.List;
 /**
  * Created by ikuchmin on 03.03.16.
  */
-public interface DirectedGraph<V, E extends Edge<V>> extends Graph<V, E> {
+public interface DirectedGraph<V, E extends Edge<V>, G extends DirectedGraph<V, E, G>>
+        extends Graph<V, E, G> {
 
     /**
      * Returns a set of all edges incoming into the specified vertex.
@@ -18,6 +19,8 @@ public interface DirectedGraph<V, E extends Edge<V>> extends Graph<V, E> {
      */
     Collection<E> incomingEdgesOf(V vertex);
 
+    Collection<V> incomingVerticesOf(V vertex);
+
     /**
      * Returns a set of all edges outgoing from the specified vertex.
      *
@@ -27,6 +30,8 @@ public interface DirectedGraph<V, E extends Edge<V>> extends Graph<V, E> {
      * @return a set of all edges outgoing from the specified vertex.
      */
     Collection<E> outgoingEdgesOf(V vertex);
+
+    Collection<V> outgoingVerticesOf(V vertex);
 
     List<Boolean> containsOutgoingVertices(V vertex, V... vertices);
 

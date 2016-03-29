@@ -1,20 +1,19 @@
 package ru.osslabs.graph.impl
 
+import ru.osslabs.graph.collection.GraphMap
+import ru.osslabs.graph.collection.GraphMapTest
+import ru.osslabs.graph.collection.SimpleGraphMap
 import spock.lang.Specification
 
 /**
  * Created by ikuchmin on 24.03.16.
  */
-class SimpleGraphMapTest extends Specification {
+class SimpleGraphMapTest extends GraphMapTest {
 
-    def "graph map should have iterator for walk on key set"() {
-        given:
-        def graphMap = new SimpleGraphMap<String, String>().put('a1', 'v1').put('a2', 'v2')
+    SimpleGraphMap<String, String> simpleGraphMap = new SimpleGraphMap<>()
 
-        when:
-        def expectMap = graphMap.collect { it.key.startsWith('a') }
-
-        then:
-        expectMap.size() == 2
+    @Override
+    GraphMap getGraphMap() {
+        return simpleGraphMap
     }
 }

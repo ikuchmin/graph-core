@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 /**
  * Created by ikuchmin on 28.03.16.
  */
-public interface Graph<V, E extends Edge<V>>  {
+public interface Graph<V, E extends Edge<V>, G extends Graph<V, E, G>>  {
     /**
      * Add edge in this graph, going from the source vertex to the
      * target vertex, and returns graph instance. Some graphs do not allow
@@ -27,7 +27,7 @@ public interface Graph<V, E extends Edge<V>>  {
      * @throws NullPointerException     if any of the specified getVertices is <code>
      *                                  null</code>.
      */
-    Graph<V, E> addEdge(E edge);
+    G addEdge(E edge);
 
     /**
      * Add edges in this graph, going from the source vertex to the
@@ -48,7 +48,7 @@ public interface Graph<V, E extends Edge<V>>  {
      * @throws NullPointerException     if any of the specified getVertices is <code>
      *                                  null</code>.
      */
-    Graph<V, E> addEdges(Collection<? extends E> edges);
+    G addEdges(Collection<? extends E> edges);
 
     //    Graph<V, E> addEdges(E... edges);
 
@@ -82,7 +82,7 @@ public interface Graph<V, E extends Edge<V>>  {
      *                                  null</code>.
      * @see #getEdgeFactory()
      */
-    Graph<V, E> addEdge(V sourceVertex, V targetVertex);
+    G addEdge(V sourceVertex, V targetVertex);
 
     /**
      * Adds the specified vertex to this graph if not already present. More
@@ -98,11 +98,11 @@ public interface Graph<V, E extends Edge<V>>  {
      * @throws NullPointerException if the specified vertex is <code>
      *                              null</code>.
      */
-    Graph<V, E> addVertex(V v);
+    G addVertex(V v);
 
-    Graph<V, E> addVertices(V... vertices);
+    G addVertices(V... vertices);
 
-    Graph<V, E> addVertices(Collection<? extends V> vertices);
+    G addVertices(Collection<? extends V> vertices);
 
     /**
      * Adds all the getVertices and all the edges of the {@code sourceGraph} to the
@@ -110,7 +110,7 @@ public interface Graph<V, E extends Edge<V>>  {
      *
      * @return this object
      */
-    Graph<V, E> addGraph(Graph<V, E> sourceGraph);
+    G addGraph(Graph<V, E, G> sourceGraph);
 
     /**
      * Returns the edge factory using which this graph creates new edges. The
@@ -120,6 +120,25 @@ public interface Graph<V, E extends Edge<V>>  {
      * @return the edge factory using which this graph creates new edges.
      */
     BiFunction<V, V, E> getEdgeFactory();
+
+    /**
+     * Returns <tt>true</tt> if this graph contains the specified vertex. More
+     * formally, returns <tt>true</tt> if and only if this graph contains a
+     * vertex <code>u</code> such that <code>u.equals(v)</code>. If the
+     * specified vertex is <code>null</code> returns <code>false</code>.
+     *
+     * @param vertex whose presence in this graph is to be tested.
+     * @return <tt>true</tt> if this graph contains the specified vertex.
+     */
+    boolean containsVertex(V vertex);
+
+    boolean containsAllVertices(V... vertex);
+
+    boolean containsAllVertices(Collection<? extends V> vertices);
+
+    List<Boolean> containsVertices(V... vertices);
+
+    List<Boolean> containsVertices(List<? extends V> vertices);
 
     /**
      * Returns <tt>true</tt> if this graph contains the specified edge. More
@@ -132,20 +151,11 @@ public interface Graph<V, E extends Edge<V>>  {
      */
     boolean containsEdge(E e);
 
-    /**
-     * Returns <tt>true</tt> if this graph contains the specified vertex. More
-     * formally, returns <tt>true</tt> if and only if this graph contains a
-     * vertex <code>u</code> such that <code>u.equals(v)</code>. If the
-     * specified vertex is <code>null</code> returns <code>false</code>.
-     *
-     * @param v vertex whose presence in this graph is to be tested.
-     * @return <tt>true</tt> if this graph contains the specified vertex.
-     */
-    boolean containsVertex(V v);
+    boolean containsAllEdges(E... edges);
 
-    List<Boolean> containsVertices(V... v);
+    boolean containsAllEdges(Collection<? extends E> edges);
 
-    List<Boolean> containsVertices(List<? extends V> v);
+    boolean containGraph(Graph<V, E, G> graph);
 
     /**
      * Returns a set of all edges touching the specified vertex. If no edges are
@@ -158,6 +168,8 @@ public interface Graph<V, E extends Edge<V>>  {
      * @throws NullPointerException     if vertex is <code>null</code>.
      */
     Collection<E> edgesOf(V vertex);
+
+    Collection<E> getEdges();
 
     /**
      * Returns a set of the getVertices contained in this graph. The set is backed
