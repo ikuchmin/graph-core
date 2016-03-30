@@ -16,4 +16,17 @@ class SimpleGraphMapTest extends GraphMapTest {
     GraphMap getGraphMap() {
         return simpleGraphMap
     }
+
+    def "graph is capability put another graph map into"() {
+        given:
+        graphMap.put('a1', 'v1').put('a2', 'v2')
+        def source = new SimpleGraphMap().put('a3', 'v3')
+
+        when:
+        graphMap.putAll(source)
+
+        then:
+        graphMap.containsAllKey(['a1', 'a2', 'a3'])
+        graphMap.containsAllValue(['v1', 'v2', 'v3'])
+    }
 }

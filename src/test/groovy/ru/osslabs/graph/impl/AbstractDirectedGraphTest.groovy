@@ -8,6 +8,7 @@ import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.util.function.BiFunction
+import java.util.function.Function
 
 /**
  * Created by ikuchmin on 23.03.16.
@@ -15,7 +16,8 @@ import java.util.function.BiFunction
 abstract class AbstractDirectedGraphTest extends Specification {
 
 //    def directedGraph = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
-    abstract DirectedGraph getDirectedGraph();
+    abstract DirectedGraph getDirectedGraph()
+    abstract Object decorateType(String value)
 
     def "graph should is capability add vertex"() {
         when:

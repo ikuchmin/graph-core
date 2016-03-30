@@ -25,7 +25,9 @@ public interface GraphMap<K, V, GM extends GraphMap<K, V, GM>> extends Iterable<
 
     Collection<V> values();
 
-    GM putAll(GraphMap<? extends K, ? extends V, ? super GM> source);
+//    GM putAll(GraphMap<? extends K, ? extends V, ? super GM> source);
+
+    GM putAll(GM source);
 
     Collection<Map.Entry<K, V>> entries();
 }

@@ -6,15 +6,17 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by ikuchmin on 21.03.16.
  */
-public class SeparatedCollectionImpl<C, K, V> implements SeparatedCollection<C, K, V, SeparatedCollectionImpl<C, K, V>> {
+public class SeparatedCollectionImpl<C, K, V>
+        extends AbstractGraphMap<K, V, SeparatedCollectionImpl<C, K, V>>
+        implements SeparatedCollection<C, K, V, SeparatedCollectionImpl<C, K, V>> {
 
     protected final Map<C, Map<K, V>> innerMap = new HashMap<>();
     protected final Set<CompositeKey<K, C>> keys = new HashSet<>();
@@ -26,7 +28,6 @@ public class SeparatedCollectionImpl<C, K, V> implements SeparatedCollection<C, 
      * @param chooseCategoryByKey
      * @param categories
      */
-    @SafeVarargs
     public SeparatedCollectionImpl(Function2<C[], K, C> chooseCategoryByKey,
                                    C... categories) {
         this.chooseCategoryByKey = Function2.of(chooseCategoryByKey).apply(categories);
@@ -97,13 +98,6 @@ public class SeparatedCollectionImpl<C, K, V> implements SeparatedCollection<C, 
     }
 
     @Override
-    public boolean containsAllKey(Collection<? extends K> keys) {
-        return keys == null || keys.stream()
-                .map(this::containsKey)
-                .reduce(true, (acc, k) -> acc && k);
-    }
-
-    @Override
     public List<K> keys() {
         return innerMap.values().stream()
                 .flatMap(m -> m.keySet().stream())
@@ -112,14 +106,21 @@ public class SeparatedCollectionImpl<C, K, V> implements SeparatedCollection<C, 
 
     @Override
     public Collection<V> values() {
-        return null;
+        return innerMap.values().stream()
+                .flatMap(m -> m.values().stream())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public SeparatedCollectionImpl<C, K, V> putAll(GraphMap<? extends K, ? extends V, ? super SeparatedCollectionImpl<C, K, V>> source) {
-        if (!(source instanceof SeparatedCollectionImpl)) throw new IllegalArgumentException("Method works only with source instance of SimpleGraphMap");
+    public SeparatedCollectionImpl<C, K, V> putAll(SeparatedCollectionImpl<C, K, V> source) {
+        if (source == null) throw new IllegalArgumentException("Source can not be equals null");
 
-        innerMap.putAll(((SeparatedCollectionImpl)source).innerMap);
+        for (Map.Entry<C, Map<K, V>> entry : source.innerMap.entrySet()) {
+            Stream<Map.Entry<K, V>> kvMap = entry.getValue().entrySet().stream();
+            if (innerMap.containsKey(entry.getKey()))
+                        kvMap.forEach(e -> put(entry.getKey(), e.getKey(), e.getValue()));
+            else kvMap.forEach(e -> put(e.getKey(), e.getValue()));
+        }
 
         return this;
     }
@@ -155,15 +156,10 @@ public class SeparatedCollectionImpl<C, K, V> implements SeparatedCollection<C, 
 
     @Override
     public boolean containsValue(V value) {
-        return value != null && innerMap.values().stream()
+        return value == null || innerMap.values().stream()
                 .flatMap(v -> v.values().stream())
                 .filter(value::equals)
                 .findAny().isPresent();
-    }
-
-    @Override
-    public boolean containsAllValue(Collection<? extends V> keys) {
-        return false;
     }
 
     public Function<K, C> getChooseCategoryByKey() {

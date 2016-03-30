@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Created by ikuchmin on 23.03.16.
  */
-public class SimpleGraphMap<K, V> implements GraphMap<K, V, SimpleGraphMap<K, V>> {
+public class SimpleGraphMap<K, V> extends AbstractGraphMap<K,V,SimpleGraphMap<K,V>> {
     protected final Map<K, V> innerMap = new HashMap<>();
 
     @Override
@@ -25,20 +25,8 @@ public class SimpleGraphMap<K, V> implements GraphMap<K, V, SimpleGraphMap<K, V>
     }
 
     @Override
-    public boolean containsAllKey(Collection<? extends K> keys) {
-        return keys == null || keys.stream()
-                .map(this::containsKey)
-                .reduce(true, (acc, k) -> acc && k);
-    }
-
-    @Override
     public boolean containsValue(V value) {
-        return innerMap.containsValue(value);
-    }
-
-    @Override
-    public boolean containsAllValue(Collection<? extends V> values) {
-        return innerMap.values().containsAll(values);
+        return value == null || innerMap.containsValue(value);
     }
 
     @Override
@@ -52,10 +40,8 @@ public class SimpleGraphMap<K, V> implements GraphMap<K, V, SimpleGraphMap<K, V>
     }
 
     @Override
-    public SimpleGraphMap<K, V> putAll(GraphMap<? extends K, ? extends V, ? super SimpleGraphMap<K, V>> source) {
-        if (!(source instanceof SimpleGraphMap)) throw new IllegalArgumentException("Method works only with source instance of SimpleGraphMap");
-
-        innerMap.putAll(((SimpleGraphMap)source).innerMap);
+    public SimpleGraphMap<K, V> putAll(SimpleGraphMap<K, V> source) {
+        innerMap.putAll(source.innerMap);
 
         return this;
     }
