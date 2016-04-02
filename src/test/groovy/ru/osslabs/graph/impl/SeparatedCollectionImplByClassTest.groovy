@@ -96,7 +96,7 @@ class SeparatedCollectionImplByClassTest extends SeparatedCollectionTest {
         thrown IllegalArgumentException
     }
 
-    def "collection is allowing put concurent keys"() {
+    def "collection is allowing put concurrent keys"() {
         given:
         separatedCollection.put(12, PRESENT)
 

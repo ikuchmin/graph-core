@@ -155,7 +155,7 @@ public abstract class AbstractDirectedGraph<V, E extends Edge<V>, G extends Dire
     }
 
     @Override
-    public boolean containGraph(Graph<V, E, G> graph) {
+    public boolean containsGraph(Graph<V, E, G> graph) {
         return containsAllVertices(graph.getVertices()) && containsAllEdges(graph.getEdges());
     }
 

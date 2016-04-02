@@ -49,22 +49,49 @@ dependencies {
 //    args = [ "delombok", "--quiet", "src/main/java", "--target", "delombok" ]
 //}
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+task sourceJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.allJava
 }
 
 task testJar(type: Jar) {
-    classifier = 'tests'
     from sourceSets.test.output
 }
 
 publishing {
+    repositories {
+//        def mavenRepositoryCredentials = {
+//            username nexusUsername
+//            password nexusPassword
+//        }
+
+        maven {
+            name 'mavenRepositorySnapshots'
+            credentials {
+                username nexusUsername
+                password nexusPassword
+            }
+            url 'http://maven-repository.osslabs.ru/content/repositories/snapshots/'
+        }
+        maven {
+            name 'mavenRepositoryReleases'
+            credentials {
+                username nexusUsername
+                password nexusPassword
+            }
+            url 'http://maven-repository.osslabs.ru/content/repositories/releases/'
+        }
+    }
+
     publications {
-        main(MavenPublication) {
+        mainJava(MavenPublication) {
             from components.java
-            artifact sourcesJar
-            artifact testJar
+
+            artifact sourceJar {
+                classifier = 'sources'
+            }
+            artifact testJar {
+                classifier = 'tests'
+            }
         }
     }
 }

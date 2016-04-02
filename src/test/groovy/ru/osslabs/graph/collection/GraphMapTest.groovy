@@ -75,6 +75,23 @@ abstract class GraphMapTest extends Specification {
         graphMap.keys().toList() == ['a1', 'a2']
     }
 
+    def "collection of key and collection of value should be unmodifiable"() {
+        given:
+        graphMap.put('a1', 'v1').put('a2', 'v2')
+
+        when:
+        graphMap.keys().add('a3')
+
+        then:
+        thrown UnsupportedOperationException
+
+        when:
+        graphMap.values().add('v3')
+
+        then:
+        thrown UnsupportedOperationException
+    }
+
     def "graph is capability return collection of value"() {
         given:
         graphMap.put('a1', 'v1').put('a2', 'v2')

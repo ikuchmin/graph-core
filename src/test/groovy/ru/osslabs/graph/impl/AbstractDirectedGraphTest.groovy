@@ -2,13 +2,9 @@ package ru.osslabs.graph.impl
 
 import ru.osslabs.graph.DirectedGraph
 import ru.osslabs.graph.Edge
-import ru.osslabs.graph.collection.GraphMap
-import ru.osslabs.graph.collection.SimpleGraphMap
+import ru.osslabs.graph.Graph
 import spock.lang.Ignore
 import spock.lang.Specification
-
-import java.util.function.BiFunction
-import java.util.function.Function
 
 /**
  * Created by ikuchmin on 23.03.16.
@@ -17,7 +13,9 @@ abstract class AbstractDirectedGraphTest extends Specification {
 
 //    def directedGraph = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
     abstract DirectedGraph getDirectedGraph()
-    abstract Object decorateType(String value)
+    abstract Edge edgeFactory(String v1, String v2);
+    abstract List verticesFactory(List<String> vertices);
+    abstract Graph graphFactory();
 
     def "graph should is capability add vertex"() {
         when:
@@ -119,9 +117,9 @@ abstract class AbstractDirectedGraphTest extends Specification {
 
     def "if graph contains edge that method 'containsAll' should return true otherwise else"() {
         given:
-        def e1 = new ExEdge<>('v1', 'v2')
-        def e2 = new ExEdge<>('v1', 'v3')
-        def e3 = new ExEdge<>('v1', 'v4')
+        def e1 = edgeFactory('v1', 'v2')
+        def e2 = edgeFactory('v1', 'v3')
+        def e3 = edgeFactory('v1', 'v4')
 
         directedGraph.addVertices('v1', 'v2', 'v3')
                 .addEdge(e1).addEdge(e2)
@@ -185,7 +183,7 @@ abstract class AbstractDirectedGraphTest extends Specification {
         directedGraph.addVertices('v1', 'v2')
 
         when:
-        directedGraph.addEdge(new ExEdge<>('v1', 'v2'))
+        directedGraph.addEdge(edgeFactory('v1', 'v2'))
 
         then:
         directedGraph.containsOutgoingVertices('v1', 'v2') == [true]
@@ -200,7 +198,7 @@ abstract class AbstractDirectedGraphTest extends Specification {
 
     def "if edge is in graph that graph should throw exception"() {
         given:
-        def e1 = ['v3', 'v4'] as ExEdge
+        def e1 = edgeFactory('v3', 'v4')
         directedGraph.addVertices('v1', 'v2', 'v3', 'v4')
                 .addEdge('v1', 'v2').addEdge(e1)
 
@@ -224,8 +222,8 @@ abstract class AbstractDirectedGraphTest extends Specification {
 
         when:
         directedGraph.addEdges(
-                new ExEdge<>('v1', 'v2'),
-                new ExEdge<>('v1', 'v3'))
+                edgeFactory('v1', 'v2'),
+                edgeFactory('v1', 'v3'))
 
         then:
         directedGraph.containsOutgoingVertices('v1', 'v2', 'v3')
@@ -234,9 +232,9 @@ abstract class AbstractDirectedGraphTest extends Specification {
 
         when:
         directedGraph.addEdges(
-                new ExEdge<>('v1', 'v4'),
+                edgeFactory('v1', 'v4'),
                 null,
-                new ExEdge<>('v1', 'v5'))
+                edgeFactory('v1', 'v5'))
 
         then:
         thrown IllegalArgumentException
@@ -247,9 +245,9 @@ abstract class AbstractDirectedGraphTest extends Specification {
         directedGraph.addVertices('v1', 'v2', 'v3', 'v4', 'v5', 'v6')
 
         when:
-        directedGraph.addEdges([new ExEdge<>('v1', 'v2'),
-                                new ExEdge<>('v1', 'v3'),
-                                new ExEdge<>('v2', 'v3')])
+        directedGraph.addEdges([edgeFactory('v1', 'v2'),
+                                edgeFactory('v1', 'v3'),
+                                edgeFactory('v2', 'v3')])
 
         then:
         directedGraph.containsOutgoingVertices('v1', 'v2', 'v3') == [true, true]
@@ -258,9 +256,9 @@ abstract class AbstractDirectedGraphTest extends Specification {
         directedGraph.containsIncomingVertices('v3', 'v1', 'v2') == [true, true]
 
         when:
-        directedGraph.addEdges([new ExEdge<>('v4', 'v5'),
+        directedGraph.addEdges([edgeFactory('v4', 'v5'),
                                 null,
-                                new ExEdge<>('v4', 'v6')])
+                                edgeFactory('v4', 'v6')])
         then:
         thrown IllegalArgumentException
         directedGraph.containsOutgoingVertices('v4', 'v5', 'v6') == [false, false]
@@ -287,14 +285,14 @@ abstract class AbstractDirectedGraphTest extends Specification {
         directedGraph.addEdge('v1', 'v2')
 
         then:
-        directedGraph.containsEdge(new ExEdge<String>('v1', 'v2'))
+        directedGraph.containsEdge(edgeFactory('v1', 'v2'))
     }
 
 
     def "graph should return collection of edges by vertex"() {
         given:
-        def e1 = new ExEdge<>('v1', 'v2')
-        def e2 = new ExEdge<>('v1', 'v3')
+        def e1 = edgeFactory('v1', 'v2')
+        def e2 = edgeFactory('v1', 'v3')
 
         directedGraph.addVertices('v1', 'v2', 'v3')
                 .addEdge(e1).addEdge(e2)
@@ -307,8 +305,8 @@ abstract class AbstractDirectedGraphTest extends Specification {
 
     def "graph should return collection of outgoing edges"() {
         given:
-        def e1 = new ExEdge<>('v1', 'v2')
-        def e2 = new ExEdge<>('v1', 'v3')
+        def e1 = edgeFactory('v1', 'v2')
+        def e2 = edgeFactory('v1', 'v3')
 
         directedGraph.addVertices('v1', 'v2', 'v3')
                 .addEdge(e1).addEdge(e2)
@@ -321,22 +319,22 @@ abstract class AbstractDirectedGraphTest extends Specification {
 
     def "graph should return collection of outgoing vertices"() {
         given:
-        def e1 = new ExEdge<>('v1', 'v2')
-        def e2 = new ExEdge<>('v1', 'v3')
+        def e1 = edgeFactory('v1', 'v2')
+        def e2 = edgeFactory('v1', 'v3')
 
         directedGraph.addVertices('v1', 'v2', 'v3')
                 .addEdge(e1).addEdge(e2)
 
         expect:
-        directedGraph.outgoingVerticesOf('v1').toList() == ['v2', 'v3']
+        directedGraph.outgoingVerticesOf('v1').toList() == verticesFactory(['v2', 'v3'])
         directedGraph.outgoingVerticesOf('v2').empty
         directedGraph.outgoingVerticesOf('v3').empty
     }
 
     def "graph should return collection of incoming edges"() {
         given:
-        def e1 = new ExEdge<>('v1', 'v2')
-        def e2 = new ExEdge<>('v1', 'v3')
+        def e1 = edgeFactory('v1', 'v2')
+        def e2 = edgeFactory('v1', 'v3')
 
         directedGraph.addVertices('v1', 'v2', 'v3')
                 .addEdge(e1).addEdge(e2)
@@ -349,16 +347,16 @@ abstract class AbstractDirectedGraphTest extends Specification {
 
     def "graph should return collection of incoming vertices"() {
         given:
-        def e1 = new ExEdge<>('v1', 'v2')
-        def e2 = new ExEdge<>('v1', 'v3')
+        def e1 = edgeFactory('v1', 'v2')
+        def e2 = edgeFactory('v1', 'v3')
 
         directedGraph.addVertices('v1', 'v2', 'v3')
                 .addEdge(e1).addEdge(e2)
 
         expect:
         directedGraph.incomingVerticesOf('v1').empty
-        directedGraph.incomingVerticesOf('v2').toList() == ['v1']
-        directedGraph.incomingVerticesOf('v3').toList() == ['v1']
+        directedGraph.incomingVerticesOf('v2').toList() == verticesFactory(['v1'])
+        directedGraph.incomingVerticesOf('v3').toList() == verticesFactory(['v1'])
 
     }
 
@@ -377,7 +375,7 @@ abstract class AbstractDirectedGraphTest extends Specification {
         directedGraph.addVertices('v1', 'v2', 'v3')
 
         expect:
-        directedGraph.vertices.toList() == ['v1', 'v2', 'v3']
+        directedGraph.vertices.toList() == verticesFactory(['v1', 'v2', 'v3'])
 
     }
 
@@ -387,7 +385,7 @@ abstract class AbstractDirectedGraphTest extends Specification {
                 .addEdge('v1', 'v2').addEdge('v1', 'v3')
 
         expect:
-        directedGraph.edges.toList() == [['v1', 'v2'] as ExEdge, ['v1', 'v3'] as ExEdge]
+        directedGraph.edges.toList() == [edgeFactory('v1', 'v2'), edgeFactory('v1', 'v3')]
 
     }
 
@@ -407,8 +405,7 @@ abstract class AbstractDirectedGraphTest extends Specification {
     def "graph should is capability add another directed graph into"() {
         given:
         directedGraph.addVertices('v1', 'v2', 'v3')
-        def source = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
-                .addVertices('v4', 'v5', 'v6')
+        def source = graphFactory().addVertices('v4', 'v5', 'v6')
 
         when:
         directedGraph.addGraph(source)
@@ -421,7 +418,7 @@ abstract class AbstractDirectedGraphTest extends Specification {
     def "if source graph and target graph have equals vertices they should be merged"() {
         given:
         directedGraph.addVertices('v1', 'v2', 'v3')
-        def source = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+        def source = graphFactory()
                 .addVertices('v2', 'v3', 'v4')
 
         when:
@@ -436,7 +433,7 @@ abstract class AbstractDirectedGraphTest extends Specification {
         given:
         directedGraph.addVertices('v1', 'v2', 'v3')
                 .addEdge('v1', 'v2').addEdge('v1', 'v3')
-        def source = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+        def source = graphFactory()
                 .addVertices('v2', 'v3', 'v4')
                 .addEdge('v2', 'v3').addEdge('v2', 'v4')
 
@@ -455,7 +452,7 @@ abstract class AbstractDirectedGraphTest extends Specification {
         given:
         directedGraph.addVertices('v1', 'v2', 'v3')
                 .addEdge('v1', 'v2').addEdge('v1', 'v3')
-        def source = new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+        def source = graphFactory()
                 .addVertices('v1', 'v2', 'v3', 'v4')
                 .addEdge('v1', 'v2').addEdge('v2', 'v3').addEdge('v2', 'v4')
 
@@ -482,34 +479,14 @@ abstract class AbstractDirectedGraphTest extends Specification {
                 .addEdge('v1', 'v2').addEdge('v1', 'v3')
 
         expect:
-        directedGraph.containGraph(new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+        directedGraph.containsGraph(graphFactory()
                 .addVertex('v1'))
-        !directedGraph.containGraph(new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+        !directedGraph.containsGraph(graphFactory()
                 .addVertex('v4'))
-        directedGraph.containGraph(new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+        directedGraph.containsGraph(graphFactory()
                 .addVertices('v1', 'v2').addEdge('v1', 'v2'))
-        !directedGraph.containGraph(new StubDirectClass(ExEdge.metaClass.&invokeConstructor)
+        !directedGraph.containsGraph(graphFactory()
                 .addVertices('v2', 'v3').addEdge('v2', 'v3'))
 
-    }
-
-    class StubDirectClass<V, E extends Edge<V>> extends AbstractDirectedGraph<V, E, StubDirectClass<V, E>, SimpleGraphMap<V, DirectedEdgeContainer<V, E>>> {
-
-        final SimpleGraphMap<V, E> verticesMap = new SimpleGraphMap<>()
-        BiFunction<V, V, E> edgeFactory
-
-        StubDirectClass(BiFunction<V, V, E> edgeFactory) {
-            this.edgeFactory = edgeFactory
-        }
-
-        @Override
-        BiFunction<V, V, E> getEdgeFactory() {
-            return this.edgeFactory
-        }
-
-        @Override
-        protected SimpleGraphMap<V, E> getGraphMap() {
-            return verticesMap
-        }
     }
 }

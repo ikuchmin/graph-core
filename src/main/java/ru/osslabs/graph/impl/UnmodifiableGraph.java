@@ -105,8 +105,8 @@ class UnmodifiableGraph<V, E extends Edge<V>, G extends Graph<V, E, G>> implemen
     }
 
     @Override
-    public boolean containGraph(Graph<V, E, G> graph) {
-        return this.graph.containGraph(graph);
+    public boolean containsGraph(Graph<V, E, G> graph) {
+        return this.graph.containsGraph(graph);
     }
 
     @Override

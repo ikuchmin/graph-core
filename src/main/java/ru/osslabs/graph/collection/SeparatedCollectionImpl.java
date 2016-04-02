@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -99,16 +101,16 @@ public class SeparatedCollectionImpl<C, K, V>
 
     @Override
     public List<K> keys() {
-        return innerMap.values().stream()
+        return unmodifiableList(innerMap.values().stream()
                 .flatMap(m -> m.keySet().stream())
-                .collect(Collectors.toList());
+                .collect(toList()));
     }
 
     @Override
     public Collection<V> values() {
-        return innerMap.values().stream()
+        return unmodifiableList(innerMap.values().stream()
                 .flatMap(m -> m.values().stream())
-                .collect(Collectors.toList());
+                .collect(toList()));
     }
 
     @Override

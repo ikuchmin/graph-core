@@ -155,7 +155,7 @@ public interface Graph<V, E extends Edge<V>, G extends Graph<V, E, G>>  {
 
     boolean containsAllEdges(Collection<? extends E> edges);
 
-    boolean containGraph(Graph<V, E, G> graph);
+    boolean containsGraph(Graph<V, E, G> graph);
 
     /**
      * Returns a set of all edges touching the specified vertex. If no edges are
