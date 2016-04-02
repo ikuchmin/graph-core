@@ -3,6 +3,7 @@ version '1.1-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'groovy'
+apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
 apply from: 'provided.gradle'
 
@@ -12,29 +13,6 @@ repositories {
     jcenter()
     mavenLocal()
 }
-
-//compileGroovy {
-//    dependsOn = []
-//}
-//
-//classes {
-//    dependsOn = [compileGroovy]
-//}
-//
-//compileTestGroovy {
-//    dependsOn = [classes]
-//}
-//
-//testClasses {
-//    dependsOn = [compileTestGroovy]
-//}
-
-//sourceSets {
-//    main {
-//        java {srcDirs = ["src/main/java"] }
-//        groovy { srcDirs = ["src/main/groovy"] }  // compile   everything in src/ with groovy
-//    }
-//}
 
 dependencies {
     compile "org.projectlombok:lombok:1.16.8"
