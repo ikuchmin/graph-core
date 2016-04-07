@@ -1,10 +1,13 @@
 package ru.osslabs.graph.collection;
 
+import lombok.ToString;
+
 import java.util.*;
 
 /**
  * Created by ikuchmin on 23.03.16.
  */
+@ToString(callSuper = true)
 public class SimpleGraphMap<K, V> extends AbstractGraphMap<K,V,SimpleGraphMap<K,V>> {
     protected final Map<K, V> innerMap = new HashMap<>();
 

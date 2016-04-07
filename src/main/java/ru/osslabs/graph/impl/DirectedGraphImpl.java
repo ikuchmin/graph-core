@@ -1,5 +1,7 @@
 package ru.osslabs.graph.impl;
 
+import lombok.Data;
+import lombok.ToString;
 import ru.osslabs.graph.DirectedGraph;
 import ru.osslabs.graph.Edge;
 import ru.osslabs.graph.collection.GraphMap;
@@ -10,6 +12,7 @@ import java.util.function.BiFunction;
 /**
  * Created by ikuchmin on 03.03.16.
  */
+@ToString(callSuper = true)
 public class DirectedGraphImpl<V, E extends Edge<V>> extends AbstractDirectedGraph<V, E, DirectedGraphImpl<V, E>,
         SimpleGraphMap<V, DirectedEdgeContainer<V, E>>> {
 

@@ -4,6 +4,7 @@ import ru.osslabs.graph.Edge;
 import ru.osslabs.graph.Graph;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -19,16 +20,6 @@ public class BreadthFirstIterator<V, E extends Edge<V>, G extends Graph<V, E, G>
     private final Graph<V, E, G> graph;
 
     private final V startVertex;
-
-
-    public BreadthFirstIterator(Graph<V, E, G> graph) {
-        Objects.requireNonNull(graph);
-        if (graph.getVertices().isEmpty())
-            throw new IllegalArgumentException("Graph should have one or more getVertices. Current graph haven't getVertices");
-
-        this.graph = graph;
-        this.startVertex = graph.getVertices().stream().findFirst().get();
-    }
 
     public BreadthFirstIterator(Graph<V, E, G> graph, V startVertex) {
         this.graph = graph;
@@ -79,25 +70,26 @@ public class BreadthFirstIterator<V, E extends Edge<V>, G extends Graph<V, E, G>
         return StreamSupport.stream(spliterator(), false);
     }
 
-    public <R, EE extends Edge<R>, G extends Graph<R, EE, G>> G collectVertices(V startVertex,
-                                                                             G collector,
+    public <R, EE extends Edge<R>, G extends Graph<R, EE, G>> G collectVertices(G collector,
                                                                              BiFunction<Optional<R>, V, R> mapper) {
 
         Map<V, Optional<R>> mappedVertices = new HashMap<>();
 
-        BiFunction<Optional<R>, V, Optional<R>> innerFn = (parent, target) -> {
-            Optional<R> mappedVertex = Optional.ofNullable(mapper.apply(parent, target));
-            mappedVertices.put(target, mappedVertex);
+        BiFunction<Optional<R>, V, R> innerFn = (parent, target) -> {
+            R mappedVertex = mapper.apply(parent, target);
 
-            if (mappedVertex.isPresent()) {
-                collector.addVertex(mappedVertex.get());
-                if (parent.isPresent()) collector.addEdge(parent.get(), mappedVertex.get());
-            }
+            collector.addVertex(mappedVertex);
+            if (parent.isPresent()) collector.addEdge(parent.get(), mappedVertex);
+
+            // cache
+            mappedVertices.put(target, Optional.ofNullable(mappedVertex));
+
             return mappedVertex;
         };
 
         innerFn.apply(Optional.empty(), startVertex);
-        forEach(e -> innerFn.apply(mappedVertices.get(e.getSource()), e.getTarget()));
+        for (Edge<V> e : this)
+            innerFn.apply(mappedVertices.get(e.getSource()), e.getTarget());
 
         return collector;
     }
@@ -134,7 +126,6 @@ public class BreadthFirstIterator<V, E extends Edge<V>, G extends Graph<V, E, G>
                         });
             else
                 throw new RuntimeException("Algorithm has collision. Please check implementation");
-
             return target;
         }
     }

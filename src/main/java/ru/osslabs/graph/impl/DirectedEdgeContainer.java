@@ -1,5 +1,6 @@
 package ru.osslabs.graph.impl;
 
+import lombok.ToString;
 import ru.osslabs.graph.Edge;
 
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.Map;
 /**
  * A container for vertex edges.
  */
+@ToString
 public class DirectedEdgeContainer<VV, EE extends Edge<VV>> {
     private final VV vertex;
     private final Map<VV, EE> incoming = new HashMap<>();
