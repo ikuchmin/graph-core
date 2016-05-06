@@ -23,11 +23,23 @@ abstract class AbstractDirectedGraphTest extends Specification {
 
         then:
         directedGraph.containsVertex('v1')
+
+        when:
+        directedGraph.addVertex(['v2'])
+
+        then:
+        directedGraph.containsVertex('v2')
     }
 
     def "null can not added in graph"() {
         when:
         directedGraph.addVertex(null)
+
+        then:
+        thrown IllegalArgumentException
+
+        when:
+        directedGraph.addVertex([])
 
         then:
         thrown IllegalArgumentException
@@ -176,6 +188,18 @@ abstract class AbstractDirectedGraphTest extends Specification {
 
         then:
         thrown IllegalArgumentException
+    }
+
+    def "graph should is capability add edge of vertices where params are lists"() {
+        given:
+        directedGraph.addVertices('v1', 'v2')
+
+        when:
+        directedGraph.addEdge(['v1'], ['v2'])
+
+        then:
+        directedGraph.containsOutgoingVertices('v1', 'v2') == [true]
+        directedGraph.containsIncomingVertices('v2', 'v1') == [true]
     }
 
     def "graph should is capability add edge"() {

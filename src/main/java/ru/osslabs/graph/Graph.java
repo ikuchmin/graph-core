@@ -84,6 +84,8 @@ public interface Graph<V, E extends Edge<V>, G extends Graph<V, E, G>>  {
      */
     G addEdge(V sourceVertex, V targetVertex);
 
+    G addEdge(List<?> sourceVertex, List<?> targetVertex); // Groovy like syntax
+
     /**
      * Adds the specified vertex to this graph if not already present. More
      * formally, adds the specified vertex, <code>v</code>, to this graph if
@@ -99,6 +101,8 @@ public interface Graph<V, E extends Edge<V>, G extends Graph<V, E, G>>  {
      *                              null</code>.
      */
     G addVertex(V v);
+
+    G addVertex(List<?> args); // Groovy like syntax
 
     G addVertices(V... vertices);
 

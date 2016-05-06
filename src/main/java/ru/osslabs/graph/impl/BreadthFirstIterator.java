@@ -1,10 +1,10 @@
 package ru.osslabs.graph.impl;
 
+import javaslang.API;
 import ru.osslabs.graph.Edge;
 import ru.osslabs.graph.Graph;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -70,8 +70,8 @@ public class BreadthFirstIterator<V, E extends Edge<V>, G extends Graph<V, E, G>
         return StreamSupport.stream(spliterator(), false);
     }
 
-    public <R, EE extends Edge<R>, G extends Graph<R, EE, G>> G collectVertices(G collector,
-                                                                             BiFunction<Optional<R>, V, R> mapper) {
+    public <R extends List<?>, VV, EE extends Edge<VV>, G extends Graph<VV, EE, G>> G collectVertices(G collector,
+                                                                                   BiFunction<Optional<R>, V, R> mapper) {
 
         Map<V, Optional<R>> mappedVertices = new HashMap<>();
 
@@ -151,6 +151,11 @@ public class BreadthFirstIterator<V, E extends Edge<V>, G extends Graph<V, E, G>
     }
 
     @Override
+    public G addEdge(List<?> sourceVertex, List<?> targetVertex) {
+        return graph.addEdge(sourceVertex, targetVertex);
+    }
+
+    @Override
     public G addVertex(V v) {
         return graph.addVertex(v);
     }
@@ -158,6 +163,11 @@ public class BreadthFirstIterator<V, E extends Edge<V>, G extends Graph<V, E, G>
     @Override
     public G addVertices(V... vertices) {
         return graph.addVertices(vertices);
+    }
+
+    @Override
+    public G addVertex(List<?> args) {
+        return graph.addVertex(args);
     }
 
     @Override

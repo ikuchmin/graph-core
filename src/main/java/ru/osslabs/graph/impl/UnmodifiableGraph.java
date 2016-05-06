@@ -37,7 +37,17 @@ class UnmodifiableGraph<V, E extends Edge<V>, G extends Graph<V, E, G>> implemen
     }
 
     @Override
+    public G addEdge(List<?> sourceVertex, List<?> targetVertex) {
+        return graph.addEdge(sourceVertex, targetVertex);
+    }
+
+    @Override
     public G addVertex(V v) {
+        throw new UnsupportedOperationException(UNMODIFIABLE);
+    }
+
+    @Override
+    public G addVertex(List<?> args) {
         throw new UnsupportedOperationException(UNMODIFIABLE);
     }
 

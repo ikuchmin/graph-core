@@ -60,9 +60,22 @@ public abstract class AbstractDirectedGraph<V, E extends Edge<V>, G extends Dire
     @Override
     public G addEdge(V sourceVertex, V targetVertex) {
         if (sourceVertex == null) throw new IllegalArgumentException("Source vertex equals null");
-        if (targetVertex == null) throw new IllegalArgumentException("Source vertex equals null");
+        if (targetVertex == null) throw new IllegalArgumentException("Target vertex equals null");
 
         return addEdge(getEdgeFactory().apply(sourceVertex, targetVertex));
+    }
+
+    @Override
+    public G addEdge(List<?> sourceVertex, List<?> targetVertex) {
+        if (sourceVertex == null) throw new IllegalArgumentException("Source equals null");
+        if (sourceVertex.isEmpty()) throw new IllegalArgumentException("List args in source param is empty");
+        if (sourceVertex.size() > 1) throw new IllegalArgumentException("List args in source param cannot has elements greater-than one");
+
+        if (targetVertex == null) throw new IllegalArgumentException("Target equals null");
+        if (targetVertex.isEmpty()) throw new IllegalArgumentException("List args in target param is empty");
+        if (targetVertex.size() > 1) throw new IllegalArgumentException("List args in target param cannot has elements greater-than one");
+
+        return addEdge((V) sourceVertex.get(0), (V) targetVertex.get(0));
     }
 
     @Override
@@ -75,6 +88,15 @@ public abstract class AbstractDirectedGraph<V, E extends Edge<V>, G extends Dire
         getGraphMap().put(vertex, new DirectedEdgeContainer<>(vertex));
 
         return (G) this;
+    }
+
+    @Override
+    public G addVertex(List<?> args) {
+        if (args == null) throw new IllegalArgumentException("Args equals null");
+        if (args.isEmpty()) throw new IllegalArgumentException("List args is empty");
+        if (args.size() > 1) throw new IllegalArgumentException("List args cannot has elements greater-than one");
+
+        return this.addVertex((V) args.get(0)); // it is not a bug
     }
 
     @Override

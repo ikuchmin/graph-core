@@ -28,7 +28,7 @@ class BreadthFirstIteratorTest extends Specification {
         when:
         def newGraph = dfsGraph.collectVertices(
                 new DirectedGraphImpl<>({ s, t -> new ExEdge<>(s, t) }),
-                { parent, vertex -> vertex + '_suffix' })
+                { parent, vertex -> [vertex + '_suffix'] })
 
         then:
         newGraph.vertices.containsAll(['v1_suffix', 'v2_suffix', 'v3_suffix'])
@@ -46,7 +46,7 @@ class BreadthFirstIteratorTest extends Specification {
 
         when:
         def newGraph = dfsGraph.collectVertices(new DirectedGraphImpl<>({ s, t -> new ExEdge<>(s, t) }),
-                { parent, vertex -> vertex })
+                { parent, vertex -> [vertex] })
 
         then:
         newGraph.vertices.containsAll(['v1', 'v2', 'v3'])
